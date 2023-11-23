@@ -7,10 +7,10 @@
 .. include:: <isonum.txt>
 
 
-Tutorials/Basic
-==========================
 
-The tutorials in amrex/Tutorials/Basic demonstrate the most fundamental
+Tutorials/Basic
+
+The tutorials in ``amrex_tutorials/ExampleCodes/Basic`` demonstrate the most fundamental
 operations supported by AMReX.
 
 **HelloWorld**
@@ -31,6 +31,7 @@ test on whether amrex_parallel_ioprocessor() is true, and if so, invoke
 the usual Fortran print call.
 
 
+
 **Demo Tutorial**
 ------------------
 
@@ -39,6 +40,8 @@ while walking through a compile |rarr| run |rarr| visualize pipeline. Demo tutor
 the online coding environment GitPod and can be found by follow `this link`_.
 
 .. _`this link`: https://amrex-codes.github.io/amrex/docs_html/DemoTutorial.html
+
+
 
 
 **main**
@@ -58,7 +61,7 @@ main_C and main_F introduce the following:
     Here, `executable` is the filename of the executable, `inputs_file` is the file containing
     runtime parameters used to build AMReX ParmParse database, and `parm=value` is an input
     parameter that will override its value in `inputs_file`.  Both `inputs_file` and
-    `parm=value` are optional.  At most one `inputs_file` is allowed. Howeer, there can be
+    `parm=value` are optional.  At most one `inputs_file` is allowed. However, there can be
     multiple `parm=value` s.
 
     The parsing of the command line arguments is performed in amrex::Initialize.  Applications
