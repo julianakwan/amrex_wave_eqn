@@ -1,16 +1,12 @@
-This repository contains tutorials built using the AMReX adaptive
-mesh refinement framework, available at: https://github.com/AMReX-Codes/amrex/
+This solves the scalar wave equation $\frac{\partial^2 u}{\partial t^2} = \nabla u$.
+If we define $v = \frac{\partial u}{\partial t}$, then we have two
+first-order partial differential equations, $\frac{\partial u}{\partial t} = v$
+and $\frac{\partial v}{\partial t} = \nabla u$.  The Laplacian operator is
+discretized dimension by dimension with a fourth-order stencil,
 
-Corresponding documentation for these tutorials is available at:
-https://amrex-codes.github.io/amrex/tutorials_html/
+$$\frac{\partial^2 u}{\partial x^2} = \left(-\frac{5}{2} u_i + \frac{4}{3} (u_{i-1} + u_{i+1}) - \frac{1}{12} (u_{i-2} + u_{i+2})\right) / \Delta x^2$$
 
-
-NOTICE.  This Software was developed under funding from the
-U.S. Department of Energy and the U.S. Government consequently retains
-certain rights. As such, the U.S. Government has been granted for
-itself and others acting on its behalf a paid-up, nonexclusive,
-irrevocable, worldwide license in the Software to reproduce,
-distribute copies to the public, prepare derivative works, and perform
-publicly and display publicly, and to permit other to do so.
-
-The license for these tutorials can be found at [LICENSE](LICENSE).
+The time stepping is done with a Runge-Kutta method (RK2, RK3 or RK4).  In
+this test, the displacement at the x-direction boundaries is zero, and the
+it's periodic in the y-direction.  Note that refluxing is not implemented in
+this test code.
