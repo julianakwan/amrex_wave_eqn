@@ -2,7 +2,7 @@ AMREX_HOME ?= ../../../../amrex
 
 DEBUG = FALSE
 
-DIM = 2
+DIM = 3
 
 USE_MPI = TRUE
 USE_OMP = FALSE
@@ -17,6 +17,8 @@ BL_NO_FORT = TRUE
 AMREX_NO_PROBINIT = TRUE
 
 CXXSTD=c++17
+
+COMP=intel-llvm
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
 
