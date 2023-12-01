@@ -4,17 +4,37 @@ from matplotlib import rc_context
 from matplotlib.animation import FuncAnimation
 import sys
 import glob
+import numpy as np
 
 
 def plot_single_slice(file_dir, stepno):
     #Directory to AMReX outputs
-    input_filename = glob.glob(file_dir+"plt{:0>5d}.old.*".format(stepno))
+
+    suffix = ""
+    
+    try:
+        input_filename = glob.glob(file_dir+"plt{:0>5d}.old.*".format(stepno))
+        f = open(input_filename+"/Header", 'r')
+        suffix = "plt{:0>5d}.old.*"
+        print("Here at try\n");
+    except:
+        f = open(file_dir+"plt{:0>5d}/Header".format(stepno), 'r')
+        suffix = "plt{:0>5d}*"
+        print("Here at except\n");
+    finally:
+        input_filename = glob.glob(file_dir+suffix.format(stepno))
+        print("Here at finally\n");
+        print(input_filename)
+        f.close()
+
+
+    input_filename = input_filename[0]
 
 
     #Output directory for plots
     output_filename = file_dir+"plt{:0>5d}".format(stepno)
     
-    ds = AMReXDataset(input_filename[0])
+    ds = AMReXDataset(input_filename)
 
     #can query values using 
     #field_name = 'u'
@@ -58,7 +78,7 @@ def time_series_movie(file_dir):
     return
 
 if __name__ == '__main__':
-    file_dir = "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/orig_4th_order/"
+    file_dir = "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sphere_average_down/"
 
 
 

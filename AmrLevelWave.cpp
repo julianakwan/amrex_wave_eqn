@@ -174,16 +174,16 @@ AmrLevelWave::post_timestep (int iteration)
 
         IntVect ratio = parent->refRatio(Level());
         AMREX_ASSERT(ratio == 2 || ratio == 4);
-	//        if (ratio == 2) {
-	//            // Need to fill one ghost cell for the high-order interpolation below
-	//            FillPatch(fine_level, S_fine, 1, t, State_Type, 0, ncomp);
-	//        }
+	       if (ratio == 2) {
+	           // Need to fill one ghost cell for the high-order interpolation below
+	           FillPatch(fine_level, S_fine, 1, t, State_Type, 0, ncomp);
+	       }
 
 	
 	//Original interpolation:	
-	//        FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
+        FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
 	//Average between cell faces, also removes need for fill patch;
-	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
+	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
     }
 
     AmrLevel::post_timestep(iteration);
