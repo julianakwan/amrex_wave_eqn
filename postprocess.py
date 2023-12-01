@@ -34,10 +34,11 @@ def plot_single_slice(file_dir, stepno):
 
 def time_series_movie(file_dir):
 
-    ts = yt.load(file_dir+"plt00???")
+    ts = yt.load(file_dir+"plt00???.old.*")
 
     plot = yt.SlicePlot(ts[0], "z", "u")
-
+    plot.set_zlim("u", -5e-3, 5e-3)
+    
     fig = plot.plots["u"].figure
 
 
@@ -52,7 +53,7 @@ def time_series_movie(file_dir):
 
     
     with rc_context({"mathtext.fontset":"stix"}):
-        animation.save("animation.gif", writer="pillow")
+        animation.save(file_dir+"test_scaling_animation.gif", writer="pillow")
 
     return
 
@@ -61,7 +62,7 @@ if __name__ == '__main__':
 
 
 
-    noutputs =1
+    noutputs = int(sys.argv[1])
     
     for i in range(0, noutputs):
         plot_single_slice(file_dir, i)

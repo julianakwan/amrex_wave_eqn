@@ -1,0 +1,24 @@
+Loguru caught a signal: SIGINT
+Stack trace:
+11            0x40196d /usr/local/Cluster-Apps/paraview/ParaView-5.11.1-MPI-Linu
+x-Python3.9-x86_64/bin/pvserver-real() [0x40196d]
+10      0x7f000f595d85 __libc_start_main + 229
+9             0x401806 /usr/local/Cluster-Apps/paraview/ParaView-5.11.1-MPI-Linu
+x-Python3.9-x86_64/bin/pvserver-real() [0x401806]
+8       0x7f000d803965 vtkPVSessionServer::Connect() + 1413
+7       0x7f000d802a5d vtkPVSessionServer::Connect(char const*) + 717
+6       0x7f000cfa1142 /usr/local/Cluster-Apps/paraview/ParaView-5.11.1-MPI-Linu
+x-Python3.9-x86_64/bin/../lib/libvtkRemotingCore-pv5.11.so.1(+0x40142) [0x7f000c
+fa1142]
+5       0x7f000d029400 vtkTCPNetworkAccessManager::NewConnection(char const*, vt
+kNetworkAccessManager::ConnectionResult&) + 4160
+4       0x7f000d027fed vtkTCPNetworkAccessManager::WaitForConnection(int, bool,
+char const*, bool, vtkNetworkAccessManager::ConnectionResult&) + 829
+3       0x7effe4964302 vtkServerSocket::WaitForConnection(unsigned long) + 34
+2       0x7effe4965e50 vtkSocket::SelectSocket(int, unsigned long) + 336
+1       0x7f000f68194b __select + 27
+0       0x7f000f5a9b50 /lib64/libc.so.6(+0x4eb50) [0x7f000f5a9b50]
+(  37.965s) [pvserver        ]                       :0     FATL| Signal: SIGINT
+
+(base) [dc-kwan1@cpu-q-78 amrex_wave_eqn]$
+(base) [dc-kwan1@cpu-q-78 amrex_wave_eqn]$ pvserver
