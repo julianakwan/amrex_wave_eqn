@@ -19,22 +19,24 @@ namespace {
                          const BCRec* /*bcr*/, const int /*bcomp*/,
                          const int /*orig_comp*/) const
         {
+	  //removed because periodic
+
             // In this test, we only need to fill the x-direction bounary,
             // because it's periodic in other directions.  We also could
             // have used BCType::reflect_odd, and then we would not need to
             // do anything here.  However, this is an example of how to fill
             // external Dirichlet BC.
-            const int ilo = geom.Domain().smallEnd(0);
-            const int ihi = geom.Domain().bigEnd(0);
-            const auto [i,j,k] = iv.dim3();
-            if (i < ilo) {
-                dest(i,j,k,0) = -dest(2*ilo-i-1,j,k,0);
-                dest(i,j,k,1) = -dest(2*ilo-i-1,j,k,1);
-            }
-            if (i > ihi) {
-                dest(i,j,k,0) = -dest(2*ihi-i+1,j,k,0);
-                dest(i,j,k,1) = -dest(2*ihi-i+1,j,k,1);
-            }
+            // const int ilo = geom.Domain().smallEnd(0);
+            // const int ihi = geom.Domain().bigEnd(0);
+            // const auto [i,j,k] = iv.dim3();
+            // if (i < ilo) {
+            //     dest(i,j,k,0) = -dest(2*ilo-i-1,j,k,0);
+            //     dest(i,j,k,1) = -dest(2*ilo-i-1,j,k,1);
+            // }
+            // if (i > ihi) {
+            //     dest(i,j,k,0) = -dest(2*ihi-i+1,j,k,0);
+            //     dest(i,j,k,1) = -dest(2*ihi-i+1,j,k,1);
+            // }
         }
     };
 
@@ -66,15 +68,22 @@ AmrLevelWave::variableSetUp ()
                            StateDescriptor::Point, nghost, ncomp,
                            &cell_quartic_interp);
 
-    int lo_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::ext_dir,    // external Dirichlet
+    // int lo_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::ext_dir,    // external Dirichlet
+    //                                        BCType::int_dir,    // periodic
+    //                                        BCType::int_dir) }; // periodic
+    // int hi_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::ext_dir,
+    //                                        BCType::int_dir,
+    //                                        BCType::int_dir) };
+    int lo_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::int_dir,    // periodic
                                            BCType::int_dir,    // periodic
                                            BCType::int_dir) }; // periodic
-    int hi_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::ext_dir,
+    int hi_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::int_dir,
                                            BCType::int_dir,
                                            BCType::int_dir) };
+
     Vector<BCRec> bcs(ncomp, BCRec(lo_bc, hi_bc));
 
-    StateDescriptor::BndryFunc bndryfunc(wave_bcfill);
+    StateDescriptor::BndryFunc bndryfunc(wave_bcfill);  
     bndryfunc.setRunOnGPU(true);
 
     desc_lst.setComponent(State_Type, 0, {"u", "v"}, bcs, bndryfunc); //could add extra derived variable here? 

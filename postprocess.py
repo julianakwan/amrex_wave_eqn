@@ -13,13 +13,13 @@ def plot_single_slice(file_dir, stepno):
     suffix = ""
     
     try:
-        input_filename = glob.glob(file_dir+"plt{:0>5d}.old.*".format(stepno))
+        input_filename = glob.glob(file_dir+"/plt{:0>5d}.old.*".format(stepno))
         f = open(input_filename+"/Header", 'r')
-        suffix = "plt{:0>5d}.old.*"
+        suffix = "/plt{:0>5d}.old.*"
         print("Here at try\n");
     except:
-        f = open(file_dir+"plt{:0>5d}/Header".format(stepno), 'r')
-        suffix = "plt{:0>5d}*"
+        f = open(file_dir+"/plt{:0>5d}/Header".format(stepno), 'r')
+        suffix = "/plt{:0>5d}"
         print("Here at except\n");
     finally:
         input_filename = glob.glob(file_dir+suffix.format(stepno))
@@ -32,7 +32,7 @@ def plot_single_slice(file_dir, stepno):
 
 
     #Output directory for plots
-    output_filename = file_dir+"plt{:0>5d}".format(stepno)
+    output_filename = file_dir+"/plt{:0>5d}".format(stepno)
     
     ds = AMReXDataset(input_filename)
 
@@ -54,10 +54,10 @@ def plot_single_slice(file_dir, stepno):
 
 def time_series_movie(file_dir):
 
-    ts = yt.load(file_dir+"plt00???.old.*")
+    ts = yt.load(file_dir+"plt00???")
 
     plot = yt.SlicePlot(ts[0], "z", "u")
-    plot.set_zlim("u", -5e-3, 5e-3)
+    plot.set_zlim("u", 0, 100)
     
     fig = plot.plots["u"].figure
 
@@ -78,13 +78,16 @@ def time_series_movie(file_dir):
     return
 
 if __name__ == '__main__':
-    file_dir = "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sphere_average_down/"
+    file_dir = "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/gaussian_4th_order_square/"
+#    file_dir = "/home/dc-kwan1/scripts/AMReX/gaussian_4th_order_square/"
 
+    time_series_movie(file_dir)
 
-
-    noutputs = int(sys.argv[1])
+#    noutputs = int(sys.argv[1])
     
-    for i in range(0, noutputs):
-        plot_single_slice(file_dir, i)
+
+#    for i in range(0, noutputs):
+#        plot_single_slice(file_dir, i)
+        
 
     

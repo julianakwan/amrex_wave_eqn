@@ -1,10 +1,10 @@
-max_step = 1000
+max_step = 100
 stop_time = 2
 
-geometry.is_periodic =  0  1 1
+geometry.is_periodic =  1  1 1                    #ALSO change 
 geometry.coord_sys   =  0       # 0 => cart
-geometry.prob_lo     =  0.0  0.0     0.0
-geometry.prob_hi     =  1.0  0.0625  0.0615
+geometry.prob_lo     =  0.0  0.0  0.0
+geometry.prob_hi     =  1.0  1.0  1.0         
 
 amr.n_cell           =  128 128 128
 
@@ -22,7 +22,7 @@ amr.check_int = 100
 amr.plot_files_output = 1  # write plot files or not
 amr.plot_int = 1         # write plotfile every ? steps
 amr.plot_vars = ALL
-amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sphere_average_down/plt
+amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/gaussian_4th_order_square/plt
 
 wave.rk_order = 4
 wave.cfl = 0.2
