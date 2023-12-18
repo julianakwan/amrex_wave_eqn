@@ -1,4 +1,4 @@
-This solves the Klein-Gordon equation $\frac{\partial^2 phi}{\partial t^2} = \nabla \phi$ + V(\phi), based on AMReX's wave example (see https://github.com/AMReX-Codes/amrex-tutorials). 
+This solves the Klein-Gordon equation $\frac{\partial^2 \phi}{\partial t^2} = \nabla \phi + V(\phi)$, based on AMReX's wave example (see https://github.com/AMReX-Codes/amrex-tutorials). 
 
 The initial condition are a Gaussian pulse with the amplitude and width as free parameters in the input parameter file. 
 
