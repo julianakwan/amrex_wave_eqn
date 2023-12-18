@@ -4,11 +4,17 @@
 
 using namespace amrex;
 
-constexpr int AmrLevelWave::ncomp;
+//constexpr int AmrLevelWave::ncomp;
+
 constexpr int AmrLevelWave::nghost;
 int  AmrLevelWave::verbose = 0;
 int  AmrLevelWave::rk_order = 4;
 Real AmrLevelWave::cfl = 0.2;
+Vector<float> AmrLevelWave::ampl;
+Vector<float> AmrLevelWave::width;
+int AmrLevelWave::nfields = 1;
+Real AmrLevelWave::scalar_mass = 1.0;
+int AmrLevelWave::ncomp = nfields*2;
 
 namespace {
     struct WaveBCFill {
@@ -64,6 +70,8 @@ AmrLevelWave::variableSetUp ()
 {
     read_params();
 
+
+
     desc_lst.addDescriptor(State_Type, IndexType::TheCellType(),
                            StateDescriptor::Point, nghost, ncomp,
                            &cell_quartic_interp);
@@ -86,7 +94,26 @@ AmrLevelWave::variableSetUp ()
     StateDescriptor::BndryFunc bndryfunc(wave_bcfill);  
     bndryfunc.setRunOnGPU(true);
 
-    desc_lst.setComponent(State_Type, 0, {"u", "v"}, bcs, bndryfunc); //could add extra derived variable here? 
+    Vector<std::string> param_names(ncomp);// = {"u1", "v1", "u2", "v2"};
+    
+    // amrex::Print() << ncomp <<  "\n";
+    // amrex::Print() << nfields <<  "\n";
+
+    for (int n = 0; n < nfields; n++)
+      {
+	char name[2];
+	sprintf(name, "phi%d", n);
+	param_names[2*n] = name;
+	sprintf(name, "dphi%d", n);
+	param_names[2*n+1] = name;
+      }
+
+    // for (int n = 0; n < ncomp; n++)
+    //   amrex::Print() << param_names[n] << " " << n <<  "\n";
+
+
+
+    desc_lst.setComponent(State_Type, 0, param_names, bcs, bndryfunc); 
 }
 
 void
@@ -224,4 +251,21 @@ AmrLevelWave::read_params ()
     pp.query("v", verbose); // Could use this to control verbosity during the run
     pp.query("rk_order", rk_order);
     pp.query("cfl", cfl);
+    pp.query("nfields", nfields);
+    pp.getarr("initial_amplitude", ampl,0,nfields); 
+    pp.getarr("initial_width", width,0,nfields); 
+    pp.query("scalar_mass", scalar_mass); 
+
+    ncomp = 2*nfields;
+
+    // // read array of initial amplitudes
+    // Vector<float> ampl;
+    // int nx;
+    // if (nx=pp.countval("initial_amplitude")) {
+    //    // get nx values starting at index 0 and store in ampl.
+    //    // dx is automatically resized here.
+    //    pp.getarr("initial_amplitude",ampl,0,nx);
+    // }
+
+
 }

@@ -85,17 +85,28 @@ public:
     // Need to be public for CUDA
     void computeRHS (amrex::MultiFab& dSdt, amrex::MultiFab const& S);
 
+    amrex::Real Potential (amrex::Real phi);
+
 private:
 
-    static constexpr int ncomp  = 2; // Two variables: u & v
+
     static constexpr int nghost = 2; // Two ghost cells needed
 
     static int verbose;
     static int rk_order;
     static amrex::Real cfl;
+  //    static double ampl;  
+  //    static double width;
+    static amrex::Vector<float> ampl;
+    static amrex::Vector<float> width;
+    static int nfields;
+    static double scalar_mass; 
 
     //! Function to read parameters from input file.
     static void read_params ();
+
+    static int ncomp;
+  //  static constexpr int ncomp;//  = nfields*2; // Two variables: u & v  
 
     //! Get AmrLevelWave
     AmrLevelWave& getLevel (int lev) {

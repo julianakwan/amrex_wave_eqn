@@ -1,0 +1,44 @@
+Host Name: cpu-q-55
+=== If no file names and line numbers are shown below, one can run
+            addr2line -Cpfie my_exefile my_line_address
+    to convert `my_line_address` (e.g., 0x4a6b) into file name and line number.
+    Or one can use amrex/Tools/Backtrace/parse_bt.py.
+
+=== Please note that the line number reported by addr2line may not be accurate.
+    One can use
+            readelf -wl my_exefile | grep my_line_address'
+    to find out the offset for that line.
+
+ 0: main3d.intel-llvm.MPI.ex() [0x671d76]
+    amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at ??:?
+
+ 1: main3d.intel-llvm.MPI.ex() [0x67378e]
+    amrex::BLBackTrace::handler(int) at ??:?
+
+ 2: /lib64/libc.so.6(+0x4eb50) [0x7f87d7f6bb50]
+
+ 3: main3d.intel-llvm.MPI.ex() [0x7c4692]
+    amrex::StateDescriptor::setComponent(int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, amrex::BCRec const&, amrex::StateDescriptor::BndryFunc const&, amrex::InterpBase*, int, int) at ??:?
+
+ 4: main3d.intel-llvm.MPI.ex() [0x7c445e]
+    amrex::DescriptorList::setComponent(int, int, amrex::Vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, amrex::Vector<amrex::BCRec, std::allocator<amrex::BCRec> > const&, amrex::StateDescriptor::BndryFunc const&, amrex::InterpBase*) at ??:?
+
+ 5: main3d.intel-llvm.MPI.ex() [0x40a2b7]
+    AmrLevelWave::variableSetUp() at ??:?
+
+ 6: main3d.intel-llvm.MPI.ex() [0x76c8fa]
+    amrex::Amr::InitAmr() at ??:?
+
+ 7: main3d.intel-llvm.MPI.ex() [0x75275b]
+    amrex::Amr::Amr(amrex::LevelBld*) at ??:?
+
+ 8: main3d.intel-llvm.MPI.ex() [0x41b9d5]
+    main at ??:?
+
+ 9: /lib64/libc.so.6(__libc_start_main+0xe5) [0x7f87d7f57d85]
+    __libc_start_main
+/usr/src/debug/glibc-2.28-236.el8.6.x86_64/csu/../csu/libc-start.c:336:3
+
+10: main3d.intel-llvm.MPI.ex() [0x4084ee]
+    _start at ??:?
+

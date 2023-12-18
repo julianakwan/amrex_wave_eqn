@@ -44,7 +44,7 @@ int main (int argc, char* argv[])
 	    if (amr->plotInt() > 0 && current_step%amr->plotInt()==0)
 	      {
 		const std::string& output_fname = amrex::Concatenate("plt", current_step, 5);
-		amrex::Print() << AMREX_SPACEDIM << "\n\n";
+		//		amrex::Print() << AMREX_SPACEDIM << "\n\n";
 		//		WriteMultiLevelPlotfile(output_fname, amr.max_levels, 
 	      }
 	    

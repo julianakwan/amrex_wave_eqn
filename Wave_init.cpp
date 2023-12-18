@@ -24,6 +24,7 @@ AmrLevelWave::initData ()
     });
     } */
 
+
 void
 AmrLevelWave::initData ()
 {
@@ -43,12 +44,15 @@ AmrLevelWave::initData ()
         Real rr2 = (x - 0.5)*(x - 0.5) + (y - 0.5)*(y - 0.5) + (z - 0.5)*(z - 0.5);  // this is the radius 
 	Real rr = sqrt(rr2);
 
-	Real amplitude = 100.;
 
-	Real width = 0.01;
 	
         constexpr Real Pi = 3.1415926535897932384626;
-        snew[bi](i,j,k,0) = 1.0 + amplitude * std::exp(-rr2/width);
-        snew[bi](i,j,k,1) = 0.0;
+
+	for (int n = 0; n < nfields; n++)
+	  {
+	    snew[bi](i,j,k,2*n) = 1.0 + ampl[n] * std::exp(-rr2/width[n]);
+	    snew[bi](i,j,k,2*n+1) = 0.0;
+	  }
+
     });
 }
