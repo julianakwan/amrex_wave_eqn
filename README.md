@@ -6,10 +6,10 @@ The initial condition is a Gaussian pulse: $1.0 + A * exp(-r^2/\sigma)$
 
 
 There are several properties of the scalar fields that are set in the input parameter file:
-*wave.nfields - the number of scalar fields
-*wave.initial_amplitude - the initial amplitude of the Gaussian pulse, there should nfield integers here, separated by a space
-*wave.initial_width - intial width of Gaussian pulse, again one value per scalar field
-*wave.scalar_mass - scalar field mass, one per scalar field
+* wave.nfields - the number of scalar fields
+* wave.initial_amplitude - the initial amplitude of the Gaussian pulse, there should nfield integers here, separated by a space
+* wave.initial_width - intial width of Gaussian pulse, again one value per scalar field
+* wave.scalar_mass - scalar field mass, one per scalar field
 
 
 
