@@ -101,7 +101,7 @@ AmrLevelWave::variableSetUp ()
 
     for (int n = 0; n < nfields; n++)
       {
-	char name[2];
+	char name[5];
 	sprintf(name, "phi%d", n);
 	param_names[2*n] = name;
 	sprintf(name, "dphi%d", n);
