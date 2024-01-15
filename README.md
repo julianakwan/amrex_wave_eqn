@@ -10,6 +10,7 @@ There are several properties of the scalar fields that are set in the input para
 * wave.initial_amplitude - the initial amplitude of the Gaussian pulse, there should nfield integers here, separated by a space
 * wave.initial_width - intial width of Gaussian pulse, again one value per scalar field
 * wave.scalar_mass - scalar field mass, one per scalar field
+* wave.tagging_criterion - value (in first derivative) at which cells will be tagged. 
 
 
 
