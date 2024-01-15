@@ -16,6 +16,8 @@ Vector<float> AmrLevelWave::width;
 int AmrLevelWave::nfields = 1;
 Real AmrLevelWave::scalar_mass = 1.0;
 int AmrLevelWave::ncomp = nfields*2;
+Real AmrLevelWave::k_r = 1;
+Real AmrLevelWave::omega = 1;
 Vector<std::string> AmrLevelWave::diagnostics;//this is for error checking
 
 
@@ -323,6 +325,8 @@ AmrLevelWave::read_params ()
     pp.getarr("initial_amplitude", ampl,0,nfields); 
     pp.getarr("initial_width", width,0,nfields); 
     pp.query("scalar_mass", scalar_mass); 
+    pp.query("wave_vector", k_r);
+    pp.query("omega", omega); 
 
     ncomp = 2*nfields;
 

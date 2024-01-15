@@ -32,3 +32,5 @@ wave.nfields = 1
 wave.initial_amplitude = 10.0 
 wave.initial_width = 0.01 
 wave.scalar_mass = 0
+wave.k_r = 1.0
+wave.omega = 1.0

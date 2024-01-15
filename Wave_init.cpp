@@ -47,8 +47,8 @@ AmrLevelWave::initData ()
 
 	
         constexpr Real Pi = 3.1415926535897932384626;
-	constexpr Real k_r = 100;
-	constexpr Real omega = 100;
+	//	constexpr Real k_r = 1;
+	//	constexpr Real omega = 1;
 	for (int n = 0; n < nfields; n++)
 	  {
 	    //	    snew[bi](i,j,k,2*n) = 0.0;

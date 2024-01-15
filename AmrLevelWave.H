@@ -103,7 +103,9 @@ private:
     static amrex::Vector<float> ampl;
     static amrex::Vector<float> width;
     static int nfields;
-    static double scalar_mass; 
+    static amrex::Real scalar_mass; 
+    static amrex::Real k_r; 
+    static amrex::Real omega; 
 
     //! Function to read parameters from input file.
     static void read_params ();

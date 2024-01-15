@@ -8,8 +8,8 @@ void derive_func_fab(const amrex::Box & bx, amrex::FArrayBox& derfab,int dcomp, 
 		     const amrex::Real time, const int* /*bcomp*/, int /*scomp*/)
 
 {
-  constexpr amrex::Real k_r = 100;
-  constexpr amrex::Real omega = 100;
+  constexpr amrex::Real k_r = 1;  //TODO: these need to be passed in somehow...
+  constexpr amrex::Real omega = 1;
 
   const auto problo = geom.ProbLoArray();
   const auto dx = geom.CellSizeArray();
