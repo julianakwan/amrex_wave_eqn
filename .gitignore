@@ -1,5 +1,6 @@
 Backtrace.*
 nohup.out
+slurm-*.out
 *.[oa]
 *.ex
 *.ex.dSYM
