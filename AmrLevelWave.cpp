@@ -1,6 +1,7 @@
 #include "AmrLevelWave.H"
 #include <AMReX_ParmParse.H>
 #include <numeric>
+#include <Derive.H>
 
 using namespace amrex;
 
@@ -15,6 +16,13 @@ Vector<float> AmrLevelWave::width;
 int AmrLevelWave::nfields = 1;
 Real AmrLevelWave::scalar_mass = 1.0;
 int AmrLevelWave::ncomp = nfields*2;
+Vector<std::string> AmrLevelWave::diagnostics;//this is for error checking
+
+
+static Box the_same_box(const Box& b)
+{
+  return b;
+}
 
 namespace {
     struct WaveBCFill {
@@ -76,6 +84,7 @@ AmrLevelWave::variableSetUp ()
                            StateDescriptor::Point, nghost, ncomp,
                            &cell_quartic_interp);
 
+
     // int lo_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::ext_dir,    // external Dirichlet
     //                                        BCType::int_dir,    // periodic
     //                                        BCType::int_dir) }; // periodic
@@ -101,7 +110,7 @@ AmrLevelWave::variableSetUp ()
 
     for (int n = 0; n < nfields; n++)
       {
-	char name[2];
+	char name[6];
 	sprintf(name, "phi%d", n);
 	param_names[2*n] = name;
 	sprintf(name, "dphi%d", n);
@@ -114,12 +123,30 @@ AmrLevelWave::variableSetUp ()
 
 
     desc_lst.setComponent(State_Type, 0, param_names, bcs, bndryfunc); 
+
+
+    //New diagnostic variable for testing interpolation between levels (against analytic solution)
+
+    derive_lst.add(
+    		   "error", amrex::IndexType::TheCellType(),
+       		   1, diagnostics,
+		   //		   amrex::DeriveFuncFab(),		   
+		   derive_func_fab,
+		   [=](const amrex::Box &box) { return amrex::grow(box, nghost);},
+    		   &amrex::cell_quartic_interp);
+
+    derive_lst.addComponent("error", desc_lst, State_Type, 0, 1);
+
+
+
 }
+
 
 void
 AmrLevelWave::variableCleanUp ()
 {
     desc_lst.clear();
+    derive_lst.clear();
 }
 
 
@@ -220,9 +247,18 @@ AmrLevelWave::post_timestep (int iteration)
         FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
 	//Average between cell faces, also removes need for fill patch;
 	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
+
+	//	Derive("exact_soln", t, S_crse);
+
+	//		WriteMultiLevelPlotfile(output_fname, amr.max_levels, 
     }
 
+    //    const std::string& pltfile = amrex::Concatenate("plt",iteration,5);
+    //    WriteSingleLevelPlotfile(pltfile, phi_old, {"phi"}, geom, time, 0);
+
+
     AmrLevel::post_timestep(iteration);
+
 }
 
 void
@@ -242,6 +278,38 @@ AmrLevelWave::errorEst (TagBoxArray& tags, int /*clearval*/, int /*tagval*/,
             a[bi](i,j,k) = tagval;
         }
     });
+}
+
+void
+AmrLevelWave::Derive(const std::string &name, amrex::Real time, amrex::MultiFab const& S, amrex::MultiFab &S_new)
+{
+  constexpr Real k_r = 100;
+  constexpr Real omega = 100;
+
+  const auto problo = geom.ProbLoArray();
+  const auto dx = geom.CellSizeArray();
+
+  auto const& sa = S.const_arrays();
+
+  //  S_new = get_new_data(State_Type);
+  auto const& sa_out = S_new.arrays();
+
+  amrex::ParallelFor(S, 
+    [=] AMREX_GPU_DEVICE (int bi, int i, int j, int k) noexcept
+		     {
+		       auto const& s = sa[bi];
+		       //		       auto const& s_out = sa_out[bi];
+
+		       Real x = problo[0] + (i+0.5)*dx[0];
+		       Real y = problo[1] + (j+0.5)*dx[1]; 
+		       Real z = problo[2] + (k+0.5)*dx[2];
+					
+		       Real rr2 = (x - 0.5)*(x - 0.5) + (y - 0.5)*(y - 0.5) + (z - 0.5)*(z - 0.5);  // this is the radius 
+
+		       Real exact_soln = std::cos(k_r*rr2-omega*time);
+		       //		       sa_out[bi](i,j,k,0) = amrex::Math::abs(s(i,j,k,0)-exact_soln);
+
+		     });
 }
 
 void

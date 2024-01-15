@@ -38,7 +38,7 @@ AmrLevelWave::initData ()
     [=] AMREX_GPU_DEVICE (int bi, int i, int j, int k) noexcept
     {
         Real x = problo[0] + (i+0.5)*dx[0];
-	Real y = problo[1] + (j+0.5)*dx[1]; //the 0.5 makes the value cell centered (i think)
+	Real y = problo[1] + (j+0.5)*dx[1];
 	Real z = problo[2] + (k+0.5)*dx[2];
 					
         Real rr2 = (x - 0.5)*(x - 0.5) + (y - 0.5)*(y - 0.5) + (z - 0.5)*(z - 0.5);  // this is the radius 
@@ -47,11 +47,16 @@ AmrLevelWave::initData ()
 
 	
         constexpr Real Pi = 3.1415926535897932384626;
-
+	constexpr Real k_r = 100;
+	constexpr Real omega = 100;
 	for (int n = 0; n < nfields; n++)
 	  {
-	    snew[bi](i,j,k,2*n) = 1.0 + ampl[n] * std::exp(-rr2/width[n]);
-	    snew[bi](i,j,k,2*n+1) = 0.0;
+	    //	    snew[bi](i,j,k,2*n) = 0.0;
+	    //	    snew[bi](i,j,k,2*n+1) = std::exp(-16.*rr2) * std::pow(std::cos(Pi*rr2),6);
+
+	    snew[bi](i,j,k,0) = std::cos(k_r*rr2);
+	    snew[bi](i,j,k,1) = omega*std::sin(k_r*rr2);
+
 	  }
 
     });
