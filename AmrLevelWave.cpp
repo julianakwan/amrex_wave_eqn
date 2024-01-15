@@ -239,6 +239,7 @@ AmrLevelWave::errorEst (TagBoxArray& tags, int /*clearval*/, int /*tagval*/,
         (int bi, int i, int j, int k)
     {
         // Just an example, not necessarily good choice.
+        //TODO: this is only in the first scalar field, have to check for the other fields also
         if (amrex::Math::abs(s[bi](i,j,k,1)) > tagging_criterion) {
             a[bi](i,j,k) = tagval;
         }
