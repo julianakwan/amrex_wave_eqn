@@ -101,6 +101,7 @@ private:
     static amrex::Vector<float> width;
     static int nfields;
     static double scalar_mass; 
+    static double tagging_criterion;
 
     //! Function to read parameters from input file.
     static void read_params ();

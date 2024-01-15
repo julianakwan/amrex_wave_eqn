@@ -15,6 +15,7 @@ Vector<float> AmrLevelWave::width;
 int AmrLevelWave::nfields = 1;
 Real AmrLevelWave::scalar_mass = 1.0;
 int AmrLevelWave::ncomp = nfields*2;
+Real AmrLevelWave::tagging_criterion = 1e3;
 
 namespace {
     struct WaveBCFill {
@@ -101,7 +102,7 @@ AmrLevelWave::variableSetUp ()
 
     for (int n = 0; n < nfields; n++)
       {
-	char name[5];
+	char name[6];
 	sprintf(name, "phi%d", n);
 	param_names[2*n] = name;
 	sprintf(name, "dphi%d", n);
@@ -238,7 +239,7 @@ AmrLevelWave::errorEst (TagBoxArray& tags, int /*clearval*/, int /*tagval*/,
         (int bi, int i, int j, int k)
     {
         // Just an example, not necessarily good choice.
-        if (amrex::Math::abs(s[bi](i,j,k,1)) > 0.75) {
+        if (amrex::Math::abs(s[bi](i,j,k,1)) > tagging_criterion) {
             a[bi](i,j,k) = tagval;
         }
     });
@@ -255,6 +256,7 @@ AmrLevelWave::read_params ()
     pp.getarr("initial_amplitude", ampl,0,nfields); 
     pp.getarr("initial_width", width,0,nfields); 
     pp.query("scalar_mass", scalar_mass); 
+    pp.query("tagging_criterion", tagging_criterion);
 
     ncomp = 2*nfields;
 

@@ -30,3 +30,4 @@ wave.nfields = 1
 wave.initial_amplitude = 10.0 
 wave.initial_width = 0.01 
 wave.scalar_mass = 10
+wave.tagging_criterion = 1e3  #tag cells for refinement when the derivative in phi reaches this value 

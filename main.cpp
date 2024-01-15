@@ -38,15 +38,7 @@ int main (int argc, char* argv[])
         {
             amr->coarseTimeStep(stop_time);
 	    int current_step = amr->levelSteps(0);
-
 	    
-	    //I think this gives the current step for level 0
-	    if (amr->plotInt() > 0 && current_step%amr->plotInt()==0)
-	      {
-		const std::string& output_fname = amrex::Concatenate("plt", current_step, 5);
-		//		amrex::Print() << AMREX_SPACEDIM << "\n\n";
-		//		WriteMultiLevelPlotfile(output_fname, amr.max_levels, 
-	      }
 	    
         }
 
