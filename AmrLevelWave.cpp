@@ -137,7 +137,7 @@ AmrLevelWave::variableSetUp ()
 		   [=](const amrex::Box &box) { return amrex::grow(box, nghost);},
     		   &amrex::cell_quartic_interp);
 
-    derive_lst.addComponent("error", desc_lst, State_Type, 0, 1);
+    derive_lst.addComponent("frac_error", desc_lst, State_Type, 0, 1);
 
 
 
