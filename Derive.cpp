@@ -29,8 +29,10 @@ void derive_func_fab(const amrex::Box & bx, amrex::FArrayBox& derfab,int dcomp, 
 		       amrex::Real rr2 = (x - 0.5)*(x - 0.5) + (y - 0.5)*(y - 0.5) + (z - 0.5)*(z - 0.5);  // this is the radius 
 
 		       amrex::Real exact_soln = std::cos(k_r*rr2-omega*time);
-		       s_out(i,j,k,dcomp) = (s(i,j,k,0)-exact_soln)/exact_soln;
-
+		       if (time > 0)
+			 s_out(i,j,k,dcomp) = amrex::Math::abs(s(i,j,k,0)-exact_soln);
+		       else
+			 s_out(i,j,k,dcomp) = 0;
 		     });
 
 
