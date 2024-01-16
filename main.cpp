@@ -2,6 +2,10 @@
 #include <AMReX_ParmParse.H>
 #include "AmrWave.H"
 
+#ifdef USE_CATALYST
+#include "CatalystAdaptor.h"
+#endif
+
 using namespace amrex;
 
 amrex::LevelBld* getLevelBld ();

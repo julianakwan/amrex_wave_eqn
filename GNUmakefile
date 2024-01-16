@@ -11,6 +11,9 @@ USE_CUDA  = FALSE
 USE_HIP   = FALSE
 USE_SYCL  = FALSE
 
+USE_CATALYST = TRUE
+
+
 #No Fortran
 BL_NO_FORT = TRUE
 # No Fortran probin file
