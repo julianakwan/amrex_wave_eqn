@@ -5,9 +5,10 @@ CEXE_headers += AmrWave.H AmrLevelWave.H CatalystAdaptor.h
 ifeq ($(USE_CATALYST),TRUE)
 #    CATALYST_IMPLEMENTATION_PATHS = /rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst
     DEFINES += -DUSE_CATALYST	
-    INCLUDE_LOCATIONS += $(PARAVIEW_DIR)
+    INCLUDE_LOCATIONS += $(PARAVIEW_DIR)/include/catalyst-2.0/
     LIBRARY_LOCATIONS += $(CATALYST_IMPLEMENTATION_PATHS)
-    LIBRARIES += -lcatalyst-paraview
+    LIBRARIES += -lcatalyst-paraview -lcatalyst-stub -lcatalyst-vtk
+    LDFLAGS +=-Wl,--copy-dt-needed-entries
 endif
 
 
