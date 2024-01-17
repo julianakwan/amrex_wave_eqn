@@ -14,6 +14,11 @@ int main (int argc, char* argv[])
 {
     amrex::Initialize(argc,argv);
 
+#ifdef USE_CATALYST
+    CatalystAdaptor::Initialize(argc, argv);
+#endif
+
+
     int  max_step = -1;
     Real strt_time = 0.0;
     Real stop_time = -1.0;
@@ -42,6 +47,10 @@ int main (int argc, char* argv[])
         {
             amr->coarseTimeStep(stop_time);
 	    int current_step = amr->levelSteps(0);
+
+// #ifdef USE_CATALYST
+// 	    CatalystAdaptor::Execute(timeStep, time, grid, attributes);
+// #endif
 	    
 	    
         }
@@ -55,6 +64,11 @@ int main (int argc, char* argv[])
             amr->writePlotFile();
         }
     }
+
+#ifdef USE_CATALYST
+    CatalystAdaptor::Finalize();
+#endif
+
 
     amrex::Finalize();
 }
