@@ -16,8 +16,8 @@ Vector<float> AmrLevelWave::width;
 int AmrLevelWave::nfields = 1;
 Real AmrLevelWave::scalar_mass = 1.0;
 int AmrLevelWave::ncomp = nfields*2;
-Real AmrLevelWave::k_r = 1;
-Real AmrLevelWave::omega = 1;
+Real AmrLevelWave::k_r = 1.0;
+Real AmrLevelWave::omega = 1.0;
 Vector<std::string> AmrLevelWave::diagnostics;//this is for error checking
 
 
@@ -130,7 +130,7 @@ AmrLevelWave::variableSetUp ()
     //New diagnostic variable for testing interpolation between levels (against analytic solution)
 
     derive_lst.add(
-    		   "error", amrex::IndexType::TheCellType(),
+    		   "frac_error", amrex::IndexType::TheCellType(),
        		   1, diagnostics,
 		   //		   amrex::DeriveFuncFab(),		   
 		   derive_func_fab,
