@@ -3,6 +3,7 @@
 
 #include <AMReX_AmrLevel.H>
 
+
 enum StateType { State_Type = 0, NUM_STATE_TYPE };
 
 class AmrLevelWave

@@ -2,6 +2,11 @@
 #include <AMReX_ParmParse.H>
 #include <numeric>
 
+#ifdef USE_CATALYST
+#include "CatalystAdaptor.h"
+#endif
+
+
 using namespace amrex;
 
 //constexpr int AmrLevelWave::ncomp;
@@ -222,6 +227,13 @@ AmrLevelWave::post_timestep (int iteration)
 	//Average between cell faces, also removes need for fill patch;
 	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
     }
+
+#ifdef USE_CATALYST    
+    Real time = get_state_data(State_Type).curTime();
+    MultiFab& S =      this->get_new_data(State_Type);
+    CatalystAdaptor::Execute(iteration, time, S);
+#endif
+    
 
     AmrLevel::post_timestep(iteration);
 }
