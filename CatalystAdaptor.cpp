@@ -6,7 +6,9 @@
 
 #include <string>
 #include<AMReX_Print.H>
+#include<AMReX_Geometry.H>
 #include<AMReX_MultiFab.H>
+
 
 /**
  * The namespace hold wrappers for the three main functions of the catalyst API
@@ -64,7 +66,7 @@ void Initialize(int argc, char* argv[])
 }
 
 //void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
- void Execute(int cycle, double time, amrex::MultiFab& S)
+  void Execute(int cycle, double time, amrex::Geometry& geom, amrex::MultiFab& S)
 {
   // Populate the catalyst_execute argument based on the "execute" protocol [3].
   // [3] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-execute
@@ -79,7 +81,7 @@ void Initialize(int argc, char* argv[])
   auto state = exec_params["catalyst/state"];
   state["timestep"].set(cycle);
   state["time"].set(time);
-  state["multiblock"].set(1);
+  state["multiblock"].set(1); //number of channels
 
   // Channels: Named data-sources that link the data of the simulation to the
   // analysis pipeline in other words we map the simulation datastructures to
@@ -92,34 +94,118 @@ void Initialize(int argc, char* argv[])
 
 /*   // Since this example is using Conduit Mesh Blueprint to define the mesh, */
 /*   // we set the channel's type to "mesh". */
+
   channel["type"].set("mesh");
 
-/*   // now create the mesh. */
-  auto mesh = channel["data"];
+  // now create the mesh.
+  conduit_cpp::Node mesh = channel["data"]; //TODO: change to "amrdata"
+
+  // set up the fields on the mesh
+  conduit_cpp::Node fields = mesh["fields"];
+
+  // cell data corresponding to MPI process id
+  conduit_cpp::Node proc_id_field = fields["procid"];
+  proc_id_field["association"] = "element";
+  proc_id_field["topology"] = "topo";
+
+
+  int NumberOfAMRLevels = 1;
 
 /*   // populate the data node following the Mesh Blueprint [4] */
 /*   // [4] https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html */
 
 /*   // start with coordsets (of course, the sequence is not important, just make */
 /*   // it easier to think in this order). */
-  mesh["coordsets/coords/type"].set("explicit");
 
-/*   // .set_external passes just the pointer  to the analysis pipeline allowing thus for zero-copy */
-/*   // data conversion see https://llnl-conduit.readthedocs.io/en/latest/tutorial_cpp_ownership.html */
-/*   mesh["coordsets/coords/values/x"].set_external( */
-/*     grid.GetPointsArray(), grid.GetNumberOfPoints(), /\*offset=*\/0, /\*stride=*\/3 * sizeof(double)); */
-/*   mesh["coordsets/coords/values/y"].set_external(grid.GetPointsArray(), grid.GetNumberOfPoints(), */
-/*     /\*offset=*\/sizeof(double), /\*stride=*\/3 * sizeof(double)); */
-/*   mesh["coordsets/coords/values/z"].set_external(grid.GetPointsArray(), grid.GetNumberOfPoints(), */
-/*     /\*offset=*\/2 * sizeof(double), /\*stride=*\/3 * sizeof(double)); */
 
-/*   // Next, add topology */
-/*   mesh["topologies/mesh/type"].set("unstructured"); */
-/*   mesh["topologies/mesh/coordset"].set("coords"); */
-/*   mesh["topologies/mesh/elements/shape"].set("hex"); */
-/*   mesh["topologies/mesh/elements/connectivity"].set_external( */
-/*     grid.GetCellPoints(0), grid.GetNumberOfCells() * 8); */
+  amrex::ParallelFor(S,
+  [=] AMREX_GPU_DEVICE (int bi, int i, int j, int k) noexcept
+    {
 
+      for (unsigned int level = 0; level < NumberOfAMRLevels; level++)
+	{
+	  std::string patch_name = "domain_" + std::to_string(bi); //use the box index the label
+	  conduit_cpp::Node patch = mesh[patch_name];
+	  // add basic state info
+	  patch["state/domain_id"] = bi; 
+	  patch["state/cycle"] = cycle;
+	  patch["state/time"] = time;
+	  patch["state/level"] = level;
+
+	  patch["coordsets/coords/type"] = "uniform";
+
+	  const auto problo = geom.ProbLoArray();
+	  const auto probhi = geom.ProbHiArray();
+	  const auto dx = geom.CellSizeArray();
+
+	  patch["coordsets/coords/dims/i"] = probhi[0] - problo[0] + 1;
+	  patch["coordsets/coords/dims/j"] = probhi[1] - problo[1] + 1;
+	  patch["coordsets/coords/dims/k"] = probhi[2] - problo[2] + 1;
+
+	  patch["coordsets/coords/spacing/dx"] = dx[0];
+	  patch["coordsets/coords/spacing/dy"] = dx[1];
+	  patch["coordsets/coords/spacing/dz"] = dx[2];
+
+
+	  patch["coordsets/coords/origin/x"] = problo[0] + 0.5*dx[0];
+	  patch["coordsets/coords/origin/y"] = problo[1] + 0.5*dx[1];
+	  patch["coordsets/coords/origin/z"] = problo[2] + 0.5*dx[2];
+
+	  // create a rectilinear topology that refs our coordset
+	  patch["topologies/topo/type"] = "uniform";
+	  patch["topologies/topo/coordset"] = "coords";
+
+	  // add logical elements origin
+	  patch["topologies/topo/elements/origin/i0"] = problo[0];
+	  patch["topologies/topo/elements/origin/j0"] = problo[1];
+	  patch["topologies/topo/elements/origin/k0"] = problo[2];
+
+	  conduit_cpp::Node nest_set;
+	  nest_set["association"] = "element";
+	  nest_set["topology"] = "topo";
+	  if (level > 0)
+	    {
+	      // int parent_id = amr.BlockId[level - 1];
+	      // std::string parent_name = "windows/window_" + std::to_string(parent_id);
+	      // conduit_cpp::Node parent = nest_set[parent_name];
+	      // parent["domain_id"] = parent_id;
+	      // parent["domain_type"] = "parent";
+	      // std::array<int, 6> parentLevelIndices = amr.GetLevelIndices(level - 1);
+	      // parent["origin/i"] = levelIndices[0] / 2;
+	      // parent["origin/j"] = parentLevelIndices[2];
+	      // parent["origin/k"] = parentLevelIndices[4];
+	      // parent["dims/i"] = parentLevelIndices[1] - levelIndices[0] / 2 + 1;
+	      // parent["dims/j"] = parentLevelIndices[3] - parentLevelIndices[2] + 1;
+	      // ;
+	      // parent["dims/k"] = parentLevelIndices[5] - parentLevelIndices[4] + 1;
+	      // ;
+	      // parent["ratio/i"] = 2;
+	      // parent["ratio/j"] = 2;
+	      // parent["ratio/k"] = 2;
+	    }
+	  if (level < NumberOfAMRLevels - 1)
+	    {
+	      // int child_id = amr.BlockId[level];
+	      // std::string child_name = "windows/window_" + std::to_string(child_id);
+	      // conduit_cpp::Node child = nest_set[child_name];
+	      // child["domain_id"] = child_id;
+	      // child["domain_type"] = "child";
+
+	      // child["origin/i"] = levelIndices[0];
+	      // child["origin/j"] = levelIndices[2];
+	      // child["origin/k"] = levelIndices[4];
+	      
+	      // child["dims/i"] = levelIndices[1] - levelIndices[0] + 1;
+	      // child["dims/j"] = levelIndices[3] - levelIndices[2] + 1;
+	      // child["dims/k"] = levelIndices[5] - levelIndices[4] + 1;
+
+	      // child["ratio/i"] = 2;
+	      // child["ratio/j"] = 2;
+	      // child["ratio/k"] = 2;
+	    }
+	  // patch["nestsets/nest"].set(nest_set);
+	}
+    });
 /*   // Finally, add fields. */
 
 /*   // First component of the path is the name of the field . The rest are described */
