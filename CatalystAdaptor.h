@@ -5,8 +5,9 @@
 
 
 #include <catalyst.hpp>
+#include<AMReX_Geometry.H>
 #include<AMReX_MultiFab.H>
-
+#include <AMReX_Conduit_Blueprint.H>
 
 /**
  * The namespace hold wrappers for the three main functions of the catalyst API
@@ -38,7 +39,20 @@ namespace CatalystAdaptor
 /*   // [3] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-execute */
 
 //void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
-  void Execute(int cycle, double time, amrex::MultiFab& S); 
+  void Execute(int cycle, double time, amrex::Geometry& geom, amrex::MultiFab& S); 
+
+  void MultiLevelToParaviewConduitBlueprint (int n_levels,
+					      const amrex::Vector<const amrex::MultiFab*>& mfs,
+					      const amrex::Vector<std::string>& varnames,
+					      const amrex::Vector<amrex::Geometry>& geoms,
+					      amrex::Real time_value,
+					      const amrex::Vector<int>& level_steps,
+					      const amrex::Vector<amrex::IntVect>& ref_ratio,
+					      conduit_cpp::Node &res);
+
+  void FabToBlueprintTopology(const amrex::Geometry& geom,
+			      const amrex::FArrayBox& fab,
+			      conduit_cpp::Node &res);
 
 // Although no arguments are passed for catalyst_finalize  it is required in
 // order to release any resources the ParaViewCatalyst implementation has

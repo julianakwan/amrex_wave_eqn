@@ -228,10 +228,14 @@ AmrLevelWave::post_timestep (int iteration)
 	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
     }
 
+    //Move this into the loop over levels?
 #ifdef USE_CATALYST    
     Real time = get_state_data(State_Type).curTime();
+    int step_no = nStep();
     MultiFab& S =      this->get_new_data(State_Type);
-    CatalystAdaptor::Execute(iteration, time, S);
+    Geometry geom = Geom(); 
+    CatalystAdaptor::Execute(step_no, time, geom, S);
+    //    amrex::Print() << "Current iteration = " << step_no << "\n";
 #endif
     
 
