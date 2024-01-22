@@ -47,11 +47,6 @@ int main (int argc, char* argv[])
         {
             amr->coarseTimeStep(stop_time);
 	    int current_step = amr->levelSteps(0);
-
-// #ifdef USE_CATALYST
-// 	    CatalystAdaptor::Execute(timeStep, time, grid, attributes);
-// #endif
-	    
 	    
         }
 
