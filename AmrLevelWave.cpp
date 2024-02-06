@@ -22,6 +22,7 @@ Real AmrLevelWave::scalar_mass = 1.0;
 int AmrLevelWave::ncomp = nfields*2;
 Real AmrLevelWave::tagging_criterion = 1e3;
 
+
 namespace {
     struct WaveBCFill {
         AMREX_GPU_DEVICE
@@ -208,6 +209,7 @@ AmrLevelWave::computeNewDt (int finest_level, int sub_cycle,
 void
 AmrLevelWave::post_timestep (int iteration)
 {
+
     if (Level() < parent->finestLevel()) {
         auto& fine_level = getLevel(Level()+1);
         MultiFab& S_fine = fine_level.get_new_data(State_Type);
@@ -215,6 +217,8 @@ AmrLevelWave::post_timestep (int iteration)
         Real t = get_state_data(State_Type).curTime();
 
         IntVect ratio = parent->refRatio(Level());
+
+
         AMREX_ASSERT(ratio == 2 || ratio == 4);
 	       if (ratio == 2) {
 	           // Need to fill one ghost cell for the high-order interpolation below
@@ -230,12 +234,30 @@ AmrLevelWave::post_timestep (int iteration)
 
     //Move this into the loop over levels?
 #ifdef USE_CATALYST    
+
+    //If using insitu, then save the grid geometry, field data and refinement ratios  
+    //as containers to pass into Catalyst
+
+    const int output_levs = parent->finestLevel() + 1; // always have at least one level, i.e coarsest
+    amrex::Vector<const amrex::MultiFab*> mfs(output_levs);
+    amrex::Vector<amrex::IntVect> ref_ratios(output_levs);
+    amrex::Vector<amrex::Geometry> geoms(output_levs);
+
+    ref_ratios = parent->refRatio();
+
+	
+    for (int lev = 0; lev < output_levs; lev++){
+      auto& level = getLevel(lev);
+      MultiFab& S = level.get_new_data(State_Type);
+      mfs[lev] = &S; 
+      geoms[lev] = level.Geom(); //I think this is for the current level
+    }
+
+
     Real time = get_state_data(State_Type).curTime();
-    int step_no = nStep();
-    MultiFab& S =      this->get_new_data(State_Type);
-    Geometry geom = Geom(); 
-    CatalystAdaptor::Execute(step_no, time, geom, S);
-    //    amrex::Print() << "Current iteration = " << step_no << "\n";
+    amrex::Print() << "Number of levels: " << output_levs << "\n";
+    CatalystAdaptor::Execute(nStep(), time, iteration, output_levs, geoms, ref_ratios, mfs);
+    //    amrex::Print() << "Current iteration = " << nStep() << "\n";
 #endif
     
 
@@ -274,6 +296,7 @@ AmrLevelWave::read_params ()
     pp.getarr("initial_width", width,0,nfields); 
     pp.query("scalar_mass", scalar_mass); 
     pp.query("tagging_criterion", tagging_criterion);
+
 
     ncomp = 2*nfields;
 

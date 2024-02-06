@@ -1,5 +1,8 @@
 max_step = 10
 stop_time = 2
+catalyst_input_script = /home/dc-kwan1/amrex/amrex-tutorials/amrex_wave_eqn/catalyst_pipeline_with_rendering.py
+#catalyst_options = --enable-live
+
 
 geometry.is_periodic =  1  1  1                    
 geometry.coord_sys   =  0       # 0 => cart
@@ -12,22 +15,23 @@ amr.v = 1
 amr.max_level       = 1       # maximum level number allowed
 amr.ref_ratio       = 2 2 2 2 # refinement ratio
 amr.regrid_int      = 2       # how often to regrid
-amr.blocking_factor_x = 16    # block factor in x-direction
-amr.blocking_factor_y = 16     # block factor in y-direction
-amr.blocking_factor_z = 16     # block factor in z-direction
-amr.max_grid_size   = 64
+amr.blocking_factor_x = 8    # block factor in x-direction
+amr.blocking_factor_y = 8     # block factor in y-direction
+amr.blocking_factor_z = 8     # block factor in z-direction
+amr.max_grid_size   = 128
 
 amr.checkpoint_files_output = 0  # write checkpoint files or not
 amr.check_int = 100
-amr.plot_files_output = 1  # write plot files or not
+amr.plot_files_output = 0  # write plot files or not
 amr.plot_int = 1         # write plotfile every ? steps
 amr.plot_vars = ALL
-amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/test_potential/plt
+amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/insitu-viz/plt
 
 wave.rk_order = 4
 wave.cfl = 0.2
 wave.nfields = 1
 wave.initial_amplitude = 10.0 
-wave.initial_width = 0.01 
+wave.initial_width = 0.001 
 wave.scalar_mass = 10
-wave.tagging_criterion = 1e3  #tag cells for refinement when the derivative in phi reaches this value 
+wave.tagging_criterion = 10  #tag cells for refinement when the derivative in phi reaches this value 
+

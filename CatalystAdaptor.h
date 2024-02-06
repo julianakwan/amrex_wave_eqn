@@ -33,13 +33,20 @@ namespace CatalystAdaptor
 /*   // [1] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-initialize */
 /*   conduit_cpp::Node node; */
 
-  void Initialize(int argc, char* argv[]); 
+//  void Initialize(int argc, char* argv[]); 
+  void Initialize(std::string filename, std::string catalyst_options); 
 
 /*   // Populate the catalyst_execute argument based on the "execute" protocol [3]. */
 /*   // [3] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-execute */
 
 //void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
-  void Execute(int cycle, double time, amrex::Geometry& geom, amrex::MultiFab& S); 
+  void Execute(int cycle, 
+	       double time, 
+	       int iteration, 
+	       int output_levs,
+	       const amrex::Vector<amrex::Geometry>& geoms, 
+	       const amrex::Vector<amrex::IntVect>& ref_ratios, 
+	       const amrex::Vector<const amrex::MultiFab*>& mfs);
 
   void MultiLevelToParaviewConduitBlueprint (int n_levels,
 					      const amrex::Vector<const amrex::MultiFab*>& mfs,
@@ -47,12 +54,31 @@ namespace CatalystAdaptor
 					      const amrex::Vector<amrex::Geometry>& geoms,
 					      amrex::Real time_value,
 					      const amrex::Vector<int>& level_steps,
-					      const amrex::Vector<amrex::IntVect>& ref_ratio,
+					      const amrex::Vector<amrex::IntVect>& ref_ratios,
 					      conduit_cpp::Node &res);
+
+  void TestMultiLevelToParaviewConduitBlueprint (int n_levels,
+					      const amrex::Vector<const amrex::MultiFab*>& mfs,
+					      const amrex::Vector<std::string>& varnames,
+					      const amrex::Vector<amrex::Geometry>& geoms,
+					      amrex::Real time_value,
+					      const amrex::Vector<int>& level_steps,
+					      const amrex::Vector<amrex::IntVect>& ref_ratios,
+					      conduit_cpp::Node &res);
+
 
   void FabToBlueprintTopology(const amrex::Geometry& geom,
 			      const amrex::FArrayBox& fab,
+			      int ngrow, 
 			      conduit_cpp::Node &res);
+
+  bool Nestsets(const int level,
+		const int n_levels,
+		const amrex::FArrayBox &fab,
+		const amrex::Vector<const amrex::BoxArray*> box_arrays,
+		const amrex::Vector<amrex::IntVect> &ref_ratio,
+		const amrex::Vector<int> &domain_offsets,
+		conduit_cpp::Node &nestset);
 
 // Although no arguments are passed for catalyst_finalize  it is required in
 // order to release any resources the ParaViewCatalyst implementation has

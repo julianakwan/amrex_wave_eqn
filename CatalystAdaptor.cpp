@@ -13,7 +13,9 @@
 #include<AMReX_MultiFab.H>
 #include<AMReX_Conduit_Blueprint.H>
 
+
 #include <catalyst.hpp>
+
 
 #include <string>
 
@@ -39,7 +41,7 @@ namespace CatalystAdaptor
  * `conduit_node`. However, this example shows that one can
  * indeed use Catalyst's C++ API, if the developer so chooses.
  */
-void Initialize(int argc, char* argv[])
+  void Initialize(std::string filename, std::string catalyst_options)
 {
   // Populate the catalyst_initialize argument based on the "initialize" protocol [1].
   // [1] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-initialize
@@ -50,12 +52,15 @@ void Initialize(int argc, char* argv[])
   // itself. To retrieve these  arguments from the script  use the `get_args()`
   // method of the paraview catalyst module [2]
   // [2] https://kitware.github.io/paraview-docs/latest/python/paraview.catalyst.html
-  node["catalyst/scripts/script/filename"].set_string(argv[1]);
-  for (int cc = 2; cc < argc; ++cc)
-  {
-    conduit_cpp::Node list_entry = node["catalyst/scripts/script/args"].append();
-    list_entry.set(argv[cc]);
-  }
+  //  node["catalyst/scripts/script/filename"].set_string(argv[1]);
+
+  node["catalyst/scripts/script/filename"] = filename; 
+
+
+  conduit_cpp::Node list_entry = node["catalyst/scripts/script/args"].append();
+  list_entry.set(catalyst_options);
+  amrex::Print() << "Read catalyst option: " << catalyst_options << "\n"; 
+
 
   // For this example we hardcode the implementation name to "paraview" and
   // define the "PARAVIEW_IMPL_DIR" during compilation time (see the
@@ -64,6 +69,8 @@ void Initialize(int argc, char* argv[])
   node["catalyst_load/implementation"] = "paraview";
   //  node["catalyst_load/search_paths/paraview"] = PARAVIEW_IMPL_DIR;
   node["catalyst_load/search_paths/paraview"] = "/rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst";
+
+
   catalyst_status err = catalyst_initialize(conduit_cpp::c_node(&node));
   if (err != catalyst_status_ok)
   {
@@ -75,8 +82,9 @@ void Initialize(int argc, char* argv[])
     }    
 }
 
-//void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
-  void Execute(int cycle, double time, amrex::Geometry& geom, amrex::MultiFab& S)
+				       
+
+  void Execute(int cycle, double time, int iteration, int output_levs, const amrex::Vector<amrex::Geometry>& geoms, const amrex::Vector<amrex::IntVect>& ref_ratios, const amrex::Vector<const amrex::MultiFab*>& mfs)
 {
   // Populate the catalyst_execute argument based on the "execute" protocol [3].
   // [3] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-execute
@@ -92,7 +100,7 @@ void Initialize(int argc, char* argv[])
   auto state = exec_params["catalyst/state"];
   state["timestep"].set(cycle);
   state["time"].set(time);
-  state["multiblock"].set(1); //number of channels
+  //  state["multiblock"].set(1); //number of channels
 
   // Channels: Named data-sources that link the data of the simulation to the
   // analysis pipeline in other words we map the simulation datastructures to
@@ -100,177 +108,50 @@ void Initialize(int argc, char* argv[])
   // to describe data see also bellow.
 
 /*   // Add channels. */
-/*   // We only have 1 channel here. Let's name it 'grid'. */
-  auto channel = exec_params["catalyst/channels/grid"];
+/*   // We only have 1 channel here. Let's name it 'input'. */
+  auto channel = exec_params["catalyst/channels/input"];
 
 /*   // Since this example is using Conduit Mesh Blueprint to define the mesh, */
 /*   // we set the channel's type to "mesh". */
 
-  channel["type"].set("mesh");
+  channel["type"].set("mesh"); //TODO: change to "amrmesh"
 
   // now create the mesh.
-  conduit_cpp::Node mesh = channel["data"]; //TODO: change to "amrdata"
+  //when using multimesh, the additional meshes must be named e.g grid/domain for this to be
+  //a valid conduit node.
+
+  auto mesh = channel["data"];  
 
 
-  int output_levs = 1;
+  mesh["coordsets/coords/type"].set_string("uniform");
 
-  //these are containers for the grid geometry, field data and refinement ratios, one per level. 
-  amrex::Vector<const amrex::MultiFab*> mfs(output_levs);
-  amrex::Vector<amrex::IntVect> ref_ratios(output_levs);
-  amrex::Vector<amrex::Geometry> geoms(output_levs);
+  mesh["topologies/topo/type"] = "uniform";
+  // reference the coordinate set by name
+  mesh["topologies/topo/coordset"] = "coords";
 
-  for (int lev = 0; lev < output_levs; ++lev){
-    mfs[lev] = &S;
-    ref_ratios[lev] = amrex::IntVect(AMREX_D_DECL(2,2,2));
-    geoms[lev] = geom;
-  }
+  
+  amrex::Vector<int> level_steps;  
+  
+  for(int i = 0; i < output_levs; i++)
+    level_steps.push_back(iteration);
 
   amrex::Vector<std::string> varnames; 
   varnames.push_back("phi0");
-  
-  amrex::Vector<int> level_steps;
-  level_steps.push_back(cycle);
-  //  level_steps.push_back(cycle); 
 
+
+
+  conduit::Node bp_mesh;
   MultiLevelToParaviewConduitBlueprint( output_levs,      //how many levels? 
-					mfs,         //MultiFab object
-					varnames,         //name of fields passed to conduit
-					geoms,       //Simulation geometry 
-					time,             //
-					level_steps,      //??
-					ref_ratios,         //ref ratio
-					mesh);     //conduit node object
+  					mfs,         //MultiFab object
+  					varnames,         //name of fields passed to conduit
+  					geoms,       //Simulation geometry 
+  					time,             //
+  					level_steps,      //these are the iterations
+  					ref_ratios,         //ref ratio
+  					mesh);     //conduit node object
 
+  //  amrex::WriteBlueprintFiles(bp_mesh, "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/insitu-viz/conduit_example_", cycle);
 
-
-  //  amrex::WriteBlueprintFiles(mesh, "conduit_example_", cycle);
-
-
-
-
-
-
-
-  // int NumberOfAMRLevels = 1;
-
-/*   // populate the data node following the Mesh Blueprint [4] */
-/*   // [4] https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html */
-
-/*   // start with coordsets (of course, the sequence is not important, just make */
-/*   // it easier to think in this order). */
-
-
-  // amrex::ParallelFor(S,
-  // [=] AMREX_GPU_DEVICE (int bi, int i, int j, int k) noexcept
-  //   {
-
-  //     for (unsigned int level = 0; level < NumberOfAMRLevels; level++)
-  // 	{
-  // 	  std::string patch_name = "domain_" + std::to_string(bi); //use the box index the label
-  // 	  conduit_cpp::Node patch = mesh[patch_name];
-  // 	  // add basic state info
-  // 	  patch["state/domain_id"] = bi; 
-  // 	  patch["state/cycle"] = cycle;
-  // 	  patch["state/time"] = time;
-  // 	  patch["state/level"] = level;
-
-  // 	  patch["coordsets/coords/type"] = "uniform";
-
-  // 	  const auto problo = geom.ProbLoArray();
-  // 	  const auto probhi = geom.ProbHiArray();
-  // 	  const auto dx = geom.CellSizeArray();
-
-  // 	  patch["coordsets/coords/dims/i"] = probhi[0] - problo[0] + 1;
-  // 	  patch["coordsets/coords/dims/j"] = probhi[1] - problo[1] + 1;
-  // 	  patch["coordsets/coords/dims/k"] = probhi[2] - problo[2] + 1;
-
-  // 	  patch["coordsets/coords/spacing/dx"] = dx[0];
-  // 	  patch["coordsets/coords/spacing/dy"] = dx[1];
-  // 	  patch["coordsets/coords/spacing/dz"] = dx[2];
-
-
-  // 	  patch["coordsets/coords/origin/x"] = problo[0] + 0.5*dx[0];
-  // 	  patch["coordsets/coords/origin/y"] = problo[1] + 0.5*dx[1];
-  // 	  patch["coordsets/coords/origin/z"] = problo[2] + 0.5*dx[2];
-
-  // 	  // create a rectilinear topology that refs our coordset
-  // 	  patch["topologies/topo/type"] = "uniform";
-  // 	  patch["topologies/topo/coordset"] = "coords";
-
-  // 	  // add logical elements origin
-  // 	  patch["topologies/topo/elements/origin/i0"] = problo[0];
-  // 	  patch["topologies/topo/elements/origin/j0"] = problo[1];
-  // 	  patch["topologies/topo/elements/origin/k0"] = problo[2];
-
-  // 	  conduit_cpp::Node nest_set;
-  // 	  nest_set["association"] = "element";
-  // 	  nest_set["topology"] = "topo";
-  // 	  if (level > 0)
-  // 	    {
-  // 	      // int parent_id = amr.BlockId[level - 1];
-  // 	      // std::string parent_name = "windows/window_" + std::to_string(parent_id);
-  // 	      // conduit_cpp::Node parent = nest_set[parent_name];
-  // 	      // parent["domain_id"] = parent_id;
-  // 	      // parent["domain_type"] = "parent";
-  // 	      // std::array<int, 6> parentLevelIndices = amr.GetLevelIndices(level - 1);
-  // 	      // parent["origin/i"] = levelIndices[0] / 2;
-  // 	      // parent["origin/j"] = parentLevelIndices[2];
-  // 	      // parent["origin/k"] = parentLevelIndices[4];
-  // 	      // parent["dims/i"] = parentLevelIndices[1] - levelIndices[0] / 2 + 1;
-  // 	      // parent["dims/j"] = parentLevelIndices[3] - parentLevelIndices[2] + 1;
-  // 	      // ;
-  // 	      // parent["dims/k"] = parentLevelIndices[5] - parentLevelIndices[4] + 1;
-  // 	      // ;
-  // 	      // parent["ratio/i"] = 2;
-  // 	      // parent["ratio/j"] = 2;
-  // 	      // parent["ratio/k"] = 2;
-  // 	    }
-  // 	  if (level < NumberOfAMRLevels - 1)
-  // 	    {
-  // 	      // int child_id = amr.BlockId[level];
-  // 	      // std::string child_name = "windows/window_" + std::to_string(child_id);
-  // 	      // conduit_cpp::Node child = nest_set[child_name];
-  // 	      // child["domain_id"] = child_id;
-  // 	      // child["domain_type"] = "child";
-
-  // 	      // child["origin/i"] = levelIndices[0];
-  // 	      // child["origin/j"] = levelIndices[2];
-  // 	      // child["origin/k"] = levelIndices[4];
-	      
-  // 	      // child["dims/i"] = levelIndices[1] - levelIndices[0] + 1;
-  // 	      // child["dims/j"] = levelIndices[3] - levelIndices[2] + 1;
-  // 	      // child["dims/k"] = levelIndices[5] - levelIndices[4] + 1;
-
-  // 	      // child["ratio/i"] = 2;
-  // 	      // child["ratio/j"] = 2;
-  // 	      // child["ratio/k"] = 2;
-  // 	    }
-  // 	  // patch["nestsets/nest"].set(nest_set);
-  // 	}
-  //   });
-/*   // Finally, add fields. */
-
-/*   // First component of the path is the name of the field . The rest are described */
-/*   // in https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html#fields */
-/*   // under the Material-Independent Fields section. */
-/*   auto fields = mesh["fields"]; */
-/*   fields["velocity/association"].set("vertex"); */
-/*   fields["velocity/topology"].set("mesh"); */
-/*   fields["velocity/volume_dependent"].set("false"); */
-
-/*   // velocity is stored in non-interlaced form (unlike points). */
-/*   fields["velocity/values/x"].set_external( */
-/*     attribs.GetVelocityArray(), grid.GetNumberOfPoints(), /\*offset=*\/0); */
-/*   fields["velocity/values/y"].set_external(attribs.GetVelocityArray(), grid.GetNumberOfPoints(), */
-/*     /\*offset=*\/grid.GetNumberOfPoints() * sizeof(double)); */
-/*   fields["velocity/values/z"].set_external(attribs.GetVelocityArray(), grid.GetNumberOfPoints(), */
-/*     /\*offset=*\/grid.GetNumberOfPoints() * sizeof(double) * 2); */
-
-/*   // pressure is cell-data. */
-/*   fields["pressure/association"].set("element"); */
-/*   fields["pressure/topology"].set("mesh"); */
-/*   fields["pressure/volume_dependent"].set("false"); */
-/*   fields["pressure/values"].set_external(attribs.GetPressureArray(), grid.GetNumberOfCells()); */
 
   exec_params.print();
   catalyst_status err = catalyst_execute(conduit_cpp::c_node(&exec_params));
@@ -284,6 +165,95 @@ void Initialize(int argc, char* argv[])
     }
 
 }
+
+
+
+void 
+TestMultiLevelToParaviewConduitBlueprint (int n_levels,
+				       const amrex::Vector<const amrex::MultiFab*>& mfs,
+				       const amrex::Vector<std::string>& varnames,
+				       const amrex::Vector<amrex::Geometry>& geoms,
+				       amrex::Real time_value,
+				       const amrex::Vector<int>& level_steps,
+				       const amrex::Vector<amrex::IntVect>& ref_ratios,
+				       conduit_cpp::Node &mesh)
+{
+  const amrex::Geometry &geom = geoms[0];
+  const amrex::MultiFab &mf = *mfs[0];
+  const amrex::FArrayBox& fab = mf[0];
+
+  int ngrow = mf.nGrow(); //number of ghost cells
+
+
+  FabToBlueprintTopology(geom, fab, ngrow, mesh);
+
+  // int numPerDim = 128;
+  // // create the coordinate set
+  // mesh["coordsets/coords/type"] = "uniform";
+  // mesh["coordsets/coords/dims/i"] = numPerDim;
+  // mesh["coordsets/coords/dims/j"] = numPerDim;
+  // mesh["coordsets/coords/dims/k"] = numPerDim;
+
+  // // // add origin and spacing to the coordset (optional)
+  // mesh["coordsets/coords/origin/x"] = -10.0;
+  // mesh["coordsets/coords/origin/y"] = -10.0;
+  // mesh["coordsets/coords/origin/z"] = -10.0;
+  // double distancePerStep = 20.0/(numPerDim-1);
+  // mesh["coordsets/coords/spacing/dx"] = 0.0078125; //distancePerStep;
+  // mesh["coordsets/coords/spacing/dy"] = 0.0078125; //distancePerStep;
+  // mesh["coordsets/coords/spacing/dz"] = 0.0078125; //distancePerStep;
+
+  // //  add the topology
+  // //  this case is simple b/c it's implicitly derived from the coordinate set
+  // mesh["topologies/topo/type"] = "uniform";
+  // //  reference the coordinate set by name
+  // mesh["topologies/topo/coordset"] = "coords";
+
+  // now extract the FAB details
+  const amrex::Box &fab_box = fab.box();
+
+
+  int i_min = fab_box.smallEnd(0);
+  int i_max = fab_box.bigEnd(0);
+
+  int j_min = fab_box.smallEnd(1);
+  int j_max = fab_box.bigEnd(1);
+
+  int k_min = fab_box.smallEnd(2);
+  int k_max = fab_box.bigEnd(2);
+
+  amrex::Print() << "x : " << i_min << " " << i_max << "\n";
+  amrex::Print() << "y : " << j_min << " " << j_max << "\n";
+  amrex::Print() << "z : " << k_min << " " << k_max << "\n";
+
+  //  int numPerDim = 128-1; 
+  //  int numVertices = (numPerDim-1)*(numPerDim-1)*(numPerDim-1); //(i_max-i_min)*(j_max-j_min)*(k_max-k_min);
+
+
+
+  //  amrex::Print()<< "n_vert: " << numVertices << "\n";
+
+  // float *vals = new float[numVertices]; //if association = "element" then each dim is reduced by 1
+  // for (int i = 0 ; i < numVertices ; i++)
+  //   vals[i] = ( (i%2)==0 ? 0.0 : 1.0);
+
+  //  amrex::Print() << fab_box.numPts() << "\n";
+
+  // create a vertex associated field 
+  mesh["fields/phi0/association"] = "element";
+  mesh["fields/phi0/topology"] = "topo";
+  //  mesh["fields/phi0/values"].set_external(vals, numVertices);
+
+
+  amrex::Real *data_ptr = const_cast<amrex::Real*>(fab.dataPtr(0)); //0=only use phi0
+  mesh["fields/phi0/values"].set_external(data_ptr,fab.box().numPts());
+
+
+
+
+};
+
+
 void 
 MultiLevelToParaviewConduitBlueprint (int n_levels,
 				       const amrex::Vector<const amrex::MultiFab*>& mfs,
@@ -291,7 +261,7 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
 				       const amrex::Vector<amrex::Geometry>& geoms,
 				       amrex::Real time_value,
 				       const amrex::Vector<int>& level_steps,
-				       const amrex::Vector<amrex::IntVect>& ref_ratio,
+				       const amrex::Vector<amrex::IntVect>& ref_ratios,
 				       conduit_cpp::Node &mesh)
 {
     BL_PROFILE("MultiLevelToBlueprint()");
@@ -310,6 +280,8 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
     long domain_offset = (long)mesh.number_of_children();
     amrex::ParallelDescriptor::ReduceLongSum(domain_offset);
 
+
+
     amrex::Vector<const amrex::BoxArray*> box_arrays;
     amrex::Vector<int> box_offsets;
 
@@ -317,6 +289,7 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
 
     for(int i = 0; i < n_levels; i++)
     {
+
       const amrex::BoxArray &boxs = mfs[i]->boxArray();
       box_arrays.push_back(&boxs);
       if(i == 0)
@@ -327,8 +300,14 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
       {
         box_offsets[i] = box_offsets[i-1] + mfs[i]->size();
       }
+
     }
 
+
+    conduit_cpp::Node nest_set;
+
+    nest_set["association"] = "element";
+    nest_set["topology"] = "mesh";
 
 
     int num_domains = 0;
@@ -341,8 +320,11 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
         // In Blueprint speak, Each Multifab contains several domains and
         // each fab has "components" which map to a Blueprint field.
 
+
+
       const amrex::Geometry &geom = geoms[level];
       const amrex::MultiFab &mf = *mfs[level];
+      auto ref_ratio = ref_ratios[level];
 
         // ngrow tells us how many layers of ghosts
         int ngrow = mf.nGrow();
@@ -351,7 +333,7 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
         for(amrex::MFIter mfi(mf); mfi.isValid(); ++mfi)
         {
             // domain_id is mfi.index + all patches on lower levels
-            // int domain_id = mfi.index() + num_domains + domain_offset;
+	  // int domain_id = mfi.index() + num_domains + domain_offset;
             // const std::string& patch_name = amrex::Concatenate("domain_",
             //                                                    domain_id,
             //                                                    6);
@@ -359,113 +341,136 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
 	    std::string patch_name = "domain_" + std::to_string(level + n_levels * rank);
 
 
-	    conduit_cpp::Node patch = mesh[patch_name];
-            // add basic state info
-            patch["state/domain_id"] = level + n_levels * rank;
-            patch["state/cycle"] = level_steps[0];
-            patch["state/time"] = time_value;
-            patch["state/level"] = level;
-
             const amrex::FArrayBox& fab = mf[mfi];
+	    const amrex::Box &box = fab.box();
 
             // create coordset and topo
-	    FabToBlueprintTopology(geom, fab, patch);
+	    FabToBlueprintTopology(geom, fab, ngrow, mesh);
 
 
             // add the nesting relationship
             if(n_levels > 1)
             {
-                conduit_cpp::Node nest_set;
 
-		nest_set["association"] = "element";
-		nest_set["topology"] = "topo";
-		if (level > 0)
-  	    {
-  // 	      // int parent_id = amr.BlockId[level - 1];
-  // 	      // std::string parent_name = "windows/window_" + std::to_string(parent_id);
-  // 	      // conduit_cpp::Node parent = nest_set[parent_name];
-  // 	      // parent["domain_id"] = parent_id;
-  // 	      // parent["domain_type"] = "parent";
-  // 	      // std::array<int, 6> parentLevelIndices = amr.GetLevelIndices(level - 1);
-  // 	      // parent["origin/i"] = levelIndices[0] / 2;
-  // 	      // parent["origin/j"] = parentLevelIndices[2];
-  // 	      // parent["origin/k"] = parentLevelIndices[4];
-  // 	      // parent["dims/i"] = parentLevelIndices[1] - levelIndices[0] / 2 + 1;
-  // 	      // parent["dims/j"] = parentLevelIndices[3] - parentLevelIndices[2] + 1;
-  // 	      // ;
-  // 	      // parent["dims/k"] = parentLevelIndices[5] - parentLevelIndices[4] + 1;
-  // 	      // ;
-  // 	      // parent["ratio/i"] = 2;
-  // 	      // parent["ratio/j"] = 2;
-  // 	      // parent["ratio/k"] = 2;
-  	    }
-  	  if (level < n_levels - 1)
-  	    {
-  // 	      // int child_id = amr.BlockId[level];
-  // 	      // std::string child_name = "windows/window_" + std::to_string(child_id);
-  // 	      // conduit_cpp::Node child = nest_set[child_name];
-  // 	      // child["domain_id"] = child_id;
-  // 	      // child["domain_type"] = "child";
-
-  // 	      // child["origin/i"] = levelIndices[0];
-  // 	      // child["origin/j"] = levelIndices[2];
-  // 	      // child["origin/k"] = levelIndices[4];
+	      for (int i = 0; i < n_levels; i++)
+		amrex::Print() << "is box_array ok: " <<  box_arrays[i]->ok() << " " << "is box ok: " << box.ok() << "\n"; 
 	      
-  // 	      // child["dims/i"] = levelIndices[1] - levelIndices[0] + 1;
-  // 	      // child["dims/j"] = levelIndices[3] - levelIndices[2] + 1;
-  // 	      // child["dims/k"] = levelIndices[5] - levelIndices[4] + 1;
+	      Nestsets(level, n_levels, fab, box_arrays, ref_ratios, box_offsets, nest_set);
 
-  // 	      // child["ratio/i"] = 2;
-  // 	      // child["ratio/j"] = 2;
-  // 	      // child["ratio/k"] = 2;
-  	    }
-	  patch["nestsets/nest"].set(nest_set);
+
+	    	// if (level > 0)
+	    	//   {
+
+	    	//     std::vector<std::pair<int,Box> > isects
+	    	//       = box_arrays[level-1]->intersections(amrex::coarsen(box, ref_ratio[level-1]));
+
+
+		
+	    	//     for (int b = 0; b < isects.size();++b){
+
+	    	//       amrex::Print() << "currently on parent box " << b << "\n"; 
+		      
+	    	//       int parent_id = isects[b].first+box_offsets[level-1];
+	    	//       std::string parent_name = "windows/window_" + std::to_string(parent_id);
+	    	//       conduit_cpp::Node parent = nest_set[parent_name];
+
+	    	//       amrex::Box parent_box  = amrex::refine(isects[b].second, ref_ratio[level-1]);
+	    	//       amrex::Box overlap = box & parent_box; 
+
+	    	//       parent["domain_id"] = parent_id;
+	    	//       parent["domain_type"] = "parent";
+	    	//       //		    std::array<int, 6> parentLevelIndices = amr.GetLevelIndices(level - 1);
+	    	//       parent["origin/i"] = overlap.smallEnd()[0]-parent_box.smallEnd()[0];
+	    	//       parent["origin/j"] = overlap.smallEnd()[1]-parent_box.smallEnd()[1];
+	    	//       parent["origin/k"] = overlap.smallEnd()[2]-parent_box.smallEnd()[2];
+
+	    	//       parent["dims/i"] = overlap.size()[0];
+	    	//       parent["dims/j"] = overlap.size()[1];
+	    	//       parent["dims/k"] = overlap.size()[2];
+  	      
+	    	//       parent["ratio/i"] = ref_ratios[level-1][0];
+	    	//       parent["ratio/j"] = ref_ratios[level-1][1];
+	    	//       parent["ratio/k"] = ref_ratios[level-1][2];
+	    	//     }
+
+	    	//   }
+	    	// if (level < n_levels - 1)
+	    	//   {
+	    	//     std::vector<std::pair<int,Box> > isects
+	    	//       = box_arrays[level+1]->intersections(amrex::refine(box, ref_ratio[level]));
+
+	    	//     for (int b = 0; b < isects.size();++b){
+
+	    	//       amrex::Print() << "currently on child box " << b << "\n"; 
+
+	    	//       int child_id = isects[b].first + box_offsets[level+1];
+	    	//       std::string child_name = "windows/window_" + std::to_string(child_id);
+	    	//       amrex::Box child_box = amrex::coarsen(isects[b].second, ref_ratio[level]);
+	    	//       amrex::Box overlap = box & child_box;
+
+	    	//       conduit_cpp::Node child = nest_set[child_name];
+	    	//       child["domain_id"] = child_id;
+	    	//       child["domain_type"] = "child";
+
+	    	//       child["origin/i"] = overlap.smallEnd()[0]-box.smallEnd()[0];
+	    	//       child["origin/j"] = overlap.smallEnd()[1]-box.smallEnd()[1];
+	    	//       child["origin/k"] = overlap.smallEnd()[2]-box.smallEnd()[2];
+	      
+	    	//       child["dims/i"] = overlap.size()[0];
+	    	//       child["dims/j"] = overlap.size()[1];
+	    	//       child["dims/k"] = overlap.size()[2];
+
+	    	//       child["ratio/i"] = ref_ratios[level][0];
+	    	//       child["ratio/j"] = ref_ratios[level][1];
+	    	//       child["ratio/k"] = ref_ratios[level][2];
+	    	//     }
+	    	//   }
+
+	      mesh["nestsets/nest"].set(nest_set);
 
 	    }
+
+
             // add fields
 	    // set up the fields on the mesh
-	    conduit_cpp::Node fields = patch["fields"];
+	    conduit_cpp::Node fields = mesh["fields"];
+
 
 	    // cell data corresponding to MPI process id
-	    conduit_cpp::Node proc_id_field = fields["procid"]; //TODO
-	    proc_id_field["association"] = "element";
-	    proc_id_field["topology"] = "topo";
+	    conduit_cpp::Node proc_id_field = fields[varnames[0]]; //TODO: check that varnames is correct, not ID
+	    // proc_id_field["association"] = "element";
+	    // proc_id_field["topology"] = "mesh";
+	    // proc_id_field["volume_dependent"] = "false";
 
 	    amrex::Real *data_ptr = const_cast<amrex::Real*>(fab.dataPtr(0)); //0=only use phi0
 	    proc_id_field["values"].set_external(data_ptr,fab.box().numPts());
 
+	    proc_id_field["association"] = "element";
+	    proc_id_field["topology"] = "mesh";	    
+	    
+
 	    // make sure we are not asking for more components than exist.
 	    BL_ASSERT(varnames.size() <= fab.nComp());
 
-	    //	    amrex::FabToBlueprintFields(fab,varnames,patch);
+
+	    //	    amrex::Print() << fab.box().numPts() << "\n";
+
 
             // add ghost indicator if the fab has ghost cells
-            if(ngrow > 0)
-            {
-	      //	      amrex::AddFabGhostIndicatorField(fab,ngrow,patch);
-            }
+            // if(ngrow > 0)
+            // {
+
+            // }
         }
         num_domains += mf.size();
     }
 
-    // conduit_cpp::Node info;
-    // if we have mesh data, use blueprint verify
-    // to make sure we conform to what's expected
-    // for a multi-domain mesh
-
-    // if(!res.dtype().is_empty() &&
-    //    !blueprint::mesh::verify(res,info))
-    // {
-    //     // ERROR -- doesn't conform to the mesh blueprint
-    //     // show what went wrong
-    //     amrex::Print() << "ERROR: Conduit Mesh Blueprint Verify Failed!\n"
-    //                    << info.to_json();
-    // }
 
 }
 
 void FabToBlueprintTopology(const amrex::Geometry& geom,
 			    const amrex::FArrayBox& fab,
+			    int ngrow, 
 			    conduit_cpp::Node &res)
 {
     int dims = BL_SPACEDIM;
@@ -499,15 +504,18 @@ void FabToBlueprintTopology(const amrex::Geometry& geom,
     const amrex::Box &fab_box = fab.box();
 
 
-    int i_min = fab_box.smallEnd(0);
-    int i_max = fab_box.bigEnd(0);
+    int i_min = fab_box.smallEnd(0);//+ngrow;
+    int i_max = fab_box.bigEnd(0);//-ngrow;
 
-    int j_min = fab_box.smallEnd(1);
-    int j_max = fab_box.bigEnd(1);
+    int j_min = fab_box.smallEnd(1);//+ngrow;
+    int j_max = fab_box.bigEnd(1);//-ngrow;
 
     int k_min = dims > 2 ? fab_box.smallEnd(2) : 0;
     int k_max = dims > 2 ? fab_box.bigEnd(2) : 0;
 
+    amrex::Print() << "x : " << i_min << " " << i_max << "\n";
+    amrex::Print() << "y : " << j_min << " " << j_max << "\n";
+    amrex::Print() << "z : " << k_min << " " << k_max << "\n";
 
     int nx = (i_max - i_min + 1);
     int ny = (j_max - j_min + 1);
@@ -525,7 +533,7 @@ void FabToBlueprintTopology(const amrex::Geometry& geom,
     // create uniform coordset
     // (which also holds all implicit details needed for the topology)
     res["coordsets/coords/type"] = "uniform";
-    res["coordsets/coords/dims/i"] = nx+1;
+    res["coordsets/coords/dims/i"] = nx+1;  // the +1 is because the mfs are cell centered so using 'element'
     res["coordsets/coords/dims/j"] = ny+1;
 
     res["coordsets/coords/spacing/dx"] = level_dx;
@@ -542,18 +550,127 @@ void FabToBlueprintTopology(const amrex::Geometry& geom,
     }
 
     // create a rectilinear topology that refs our coordset
-    res["topologies/topo/type"] = "uniform";
-    res["topologies/topo/coordset"] = "coords";
+    res["topologies/mesh/type"] = "uniform";
+    res["topologies/mesh/coordset"] = "coords";
+
 
     // add logical elements origin
-    res["topologies/topo/elements/origin/i0"] = i_min;
-    res["topologies/topo/elements/origin/j0"] = j_min;
+    res["topologies/mesh/elements/origin/i0"] = i_min;
+    res["topologies/mesh/elements/origin/j0"] = j_min;
     if( dims > 2)
     {
-        res["topologies/topo/elements/origin/k0"] = k_min;
+        res["topologies/mesh/elements/origin/k0"] = k_min;
     }
 
 }
+
+bool Nestsets(const int level,
+              const int n_levels,
+              const amrex::FArrayBox &fab,
+              const amrex::Vector<const amrex::BoxArray*> box_arrays,
+              const amrex::Vector<amrex::IntVect> &ref_ratio,
+              const amrex::Vector<int> &domain_offsets,
+              conduit_cpp::Node &nestset)
+{
+
+    nestset["association"] = "element";
+    nestset["topology"] = "topo";
+
+    const int dims = BL_SPACEDIM;
+    const amrex::Box &box = fab.box();
+
+    bool valid = false;
+    if(level > 0)
+    {
+      // check for parents
+      std::vector<std::pair<int,amrex::Box> > isects
+        = box_arrays[level-1]->intersections(amrex::coarsen(box, ref_ratio[level-1]));
+
+      for(int b = 0; b < isects.size(); ++b)
+      {
+        valid = true;
+        // get parent box in terms of this level
+        Box parent = amrex::refine(isects[b].second, ref_ratio[level-1]);
+        Box overlap = box & parent;
+        int parent_id = isects[b].first + domain_offsets[level-1];
+
+        const std::string& w_name = amrex::Concatenate("window_",
+                                                        parent_id,
+                                                        4);
+        conduit_cpp::Node window = nestset["windows/"+w_name];
+        window["domain_id"] = parent_id;
+        window["domain_type"] = "parent";
+        // box coordinates are global to the level,
+        // but the the window is local to this box so
+        // subtract the current box origin
+        window["origin/i"] = overlap.smallEnd()[0] - box.smallEnd()[0];
+        window["origin/j"] = overlap.smallEnd()[1] - box.smallEnd()[1];
+        if(dims == 3)
+        {
+            window["origin/k"] = overlap.smallEnd()[2] - box.smallEnd()[2];
+        }
+        window["dims/i"] = overlap.size()[0];
+        window["dims/j"] = overlap.size()[1];
+        if(dims == 3)
+        {
+            window["dims/k"] = overlap.size()[2];
+        }
+        window["ratio/i"] = ref_ratio[level-1][0];
+        window["ratio/j"] = ref_ratio[level-1][1];
+        if(dims == 3)
+        {
+            window["ratio/k"] = ref_ratio[level-1][2];
+        }
+      }
+    }
+
+    if(level < n_levels - 1)
+    {
+      // check for children
+      std::vector<std::pair<int,amrex::Box> > isects
+        = box_arrays[level+1]->intersections(amrex::refine(box, ref_ratio[level]));
+
+      for(int b = 0; b < isects.size(); ++b)
+      {
+        valid = true;
+        // get child box in terms of this level
+	amrex::Box child = amrex::coarsen(isects[b].second, ref_ratio[level]);
+        int child_id = isects[b].first + domain_offsets[level+1];
+	amrex::Box overlap = box & child;
+
+        const std::string& w_name = amrex::Concatenate("window_",
+                                                        child_id,
+                                                        4);
+
+        conduit_cpp::Node window = nestset["windows/"+w_name];
+        window["domain_id"] = child_id;
+        window["domain_type"] = "child";
+        // box coordinates are global to the level,
+        // but the the window is local to this box so
+        // subtract the current box origin
+        window["origin/i"] = overlap.smallEnd()[0] - box.smallEnd()[0];
+        window["origin/j"] = overlap.smallEnd()[1] - box.smallEnd()[1];
+        if(dims == 3)
+        {
+            window["origin/k"] = overlap.smallEnd()[2] - box.smallEnd()[2];
+        }
+        window["dims/i"] = overlap.size()[0];
+        window["dims/j"] = overlap.size()[1];
+        if(dims == 3)
+        {
+            window["dims/k"] = overlap.size()[2];
+        }
+        window["ratio/i"] = ref_ratio[level][0];
+        window["ratio/j"] = ref_ratio[level][1];
+        if(dims == 3)
+        {
+            window["ratio/k"] = ref_ratio[level][2];
+        }
+      }
+    }
+    return valid;
+}
+
 
 // Although no arguments are passed for catalyst_finalize  it is required in
 // order to release any resources the ParaViewCatalyst implementation has
