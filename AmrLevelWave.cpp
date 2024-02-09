@@ -256,7 +256,7 @@ AmrLevelWave::post_timestep (int iteration)
 
     Real time = get_state_data(State_Type).curTime();
     amrex::Print() << "Number of levels: " << output_levs << "\n";
-    CatalystAdaptor::Execute(nStep(), time, iteration, output_levs, geoms, ref_ratios, mfs);
+    CatalystAdaptor::Execute(verbose, nStep(), time, iteration, output_levs, geoms, ref_ratios, mfs);
     //    amrex::Print() << "Current iteration = " << nStep() << "\n";
 #endif
     

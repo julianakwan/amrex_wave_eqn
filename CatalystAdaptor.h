@@ -39,16 +39,19 @@ namespace CatalystAdaptor
 /*   // Populate the catalyst_execute argument based on the "execute" protocol [3]. */
 /*   // [3] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-execute */
 
-//void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
-  void Execute(int cycle, 
+
+  void Execute(int verbosity,
+	       int cycle, 
 	       double time, 
 	       int iteration, 
 	       int output_levs,
 	       const amrex::Vector<amrex::Geometry>& geoms, 
 	       const amrex::Vector<amrex::IntVect>& ref_ratios, 
-	       const amrex::Vector<const amrex::MultiFab*>& mfs);
+	       const amrex::Vector<const amrex::MultiFab*>& mfs); 
 
-  void MultiLevelToParaviewConduitBlueprint (int n_levels,
+
+  void MultiLevelToParaviewConduitBlueprint (int verbosity, 
+					     int n_levels,
 					      const amrex::Vector<const amrex::MultiFab*>& mfs,
 					      const amrex::Vector<std::string>& varnames,
 					      const amrex::Vector<amrex::Geometry>& geoms,
@@ -57,7 +60,8 @@ namespace CatalystAdaptor
 					      const amrex::Vector<amrex::IntVect>& ref_ratios,
 					      conduit_cpp::Node &res);
 
-  void TestMultiLevelToParaviewConduitBlueprint (int n_levels,
+  void TestMultiLevelToParaviewConduitBlueprint (int verbosity,
+						 int n_levels,
 					      const amrex::Vector<const amrex::MultiFab*>& mfs,
 					      const amrex::Vector<std::string>& varnames,
 					      const amrex::Vector<amrex::Geometry>& geoms,
@@ -67,7 +71,8 @@ namespace CatalystAdaptor
 					      conduit_cpp::Node &res);
 
 
-  void FabToBlueprintTopology(const amrex::Geometry& geom,
+  void FabToBlueprintTopology(int verbosity,
+			      const amrex::Geometry& geom,
 			      const amrex::FArrayBox& fab,
 			      int ngrow, 
 			      conduit_cpp::Node &res);

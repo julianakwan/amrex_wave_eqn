@@ -56,10 +56,9 @@ namespace CatalystAdaptor
 
   node["catalyst/scripts/script/filename"] = filename; 
 
-
+  //TODO: this will fail for more than one option!
   conduit_cpp::Node list_entry = node["catalyst/scripts/script/args"].append();
   list_entry.set(catalyst_options);
-  amrex::Print() << "Read catalyst option: " << catalyst_options << "\n"; 
 
 
   // For this example we hardcode the implementation name to "paraview" and
@@ -78,13 +77,13 @@ namespace CatalystAdaptor
   }
   else
     {
-      amrex::Print() << "Initialized Catalyst: " << err << "\n";
+      amrex::Print() << "Initialized Catalyst: " << err << "with options" << catalyst_options << "\n";
     }    
 }
 
 				       
 
-  void Execute(int cycle, double time, int iteration, int output_levs, const amrex::Vector<amrex::Geometry>& geoms, const amrex::Vector<amrex::IntVect>& ref_ratios, const amrex::Vector<const amrex::MultiFab*>& mfs)
+  void Execute(int verbosity, int cycle, double time, int iteration, int output_levs, const amrex::Vector<amrex::Geometry>& geoms, const amrex::Vector<amrex::IntVect>& ref_ratios, const amrex::Vector<const amrex::MultiFab*>& mfs)
 {
   // Populate the catalyst_execute argument based on the "execute" protocol [3].
   // [3] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-execute
@@ -139,9 +138,14 @@ namespace CatalystAdaptor
   varnames.push_back("phi0");
 
 
+  if (verbosity>0){
+    conduit::Node bp_mesh;
+    amrex::MultiLevelToBlueprint(output_levs, mfs, varnames, geoms, time, level_steps, ref_ratios, bp_mesh);
+    amrex::WriteBlueprintFiles(bp_mesh, "conduit_example_", cycle);
+  }
 
-  conduit::Node bp_mesh;
-  MultiLevelToParaviewConduitBlueprint( output_levs,      //how many levels? 
+  MultiLevelToParaviewConduitBlueprint(verbosity,        //if > 1 then print grid info
+				       output_levs,      //how many levels? 
   					mfs,         //MultiFab object
   					varnames,         //name of fields passed to conduit
   					geoms,       //Simulation geometry 
@@ -150,10 +154,12 @@ namespace CatalystAdaptor
   					ref_ratios,         //ref ratio
   					mesh);     //conduit node object
 
-  //  amrex::WriteBlueprintFiles(bp_mesh, "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/insitu-viz/conduit_example_", cycle);
 
 
-  exec_params.print();
+  if (verbosity>0){
+    exec_params.print();
+  }
+
   catalyst_status err = catalyst_execute(conduit_cpp::c_node(&exec_params));
   if (err != catalyst_status_ok)
   {
@@ -169,7 +175,8 @@ namespace CatalystAdaptor
 
 
 void 
-TestMultiLevelToParaviewConduitBlueprint (int n_levels,
+TestMultiLevelToParaviewConduitBlueprint (int verbosity, 
+					  int n_levels,
 				       const amrex::Vector<const amrex::MultiFab*>& mfs,
 				       const amrex::Vector<std::string>& varnames,
 				       const amrex::Vector<amrex::Geometry>& geoms,
@@ -185,7 +192,7 @@ TestMultiLevelToParaviewConduitBlueprint (int n_levels,
   int ngrow = mf.nGrow(); //number of ghost cells
 
 
-  FabToBlueprintTopology(geom, fab, ngrow, mesh);
+  FabToBlueprintTopology(verbosity, geom, fab, ngrow, mesh);
 
   // int numPerDim = 128;
   // // create the coordinate set
@@ -222,9 +229,7 @@ TestMultiLevelToParaviewConduitBlueprint (int n_levels,
   int k_min = fab_box.smallEnd(2);
   int k_max = fab_box.bigEnd(2);
 
-  amrex::Print() << "x : " << i_min << " " << i_max << "\n";
-  amrex::Print() << "y : " << j_min << " " << j_max << "\n";
-  amrex::Print() << "z : " << k_min << " " << k_max << "\n";
+  
 
   //  int numPerDim = 128-1; 
   //  int numVertices = (numPerDim-1)*(numPerDim-1)*(numPerDim-1); //(i_max-i_min)*(j_max-j_min)*(k_max-k_min);
@@ -255,7 +260,8 @@ TestMultiLevelToParaviewConduitBlueprint (int n_levels,
 
 
 void 
-MultiLevelToParaviewConduitBlueprint (int n_levels,
+MultiLevelToParaviewConduitBlueprint (int verbosity,
+				      int n_levels,
 				       const amrex::Vector<const amrex::MultiFab*>& mfs,
 				       const amrex::Vector<std::string>& varnames,
 				       const amrex::Vector<amrex::Geometry>& geoms,
@@ -345,16 +351,17 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
 	    const amrex::Box &box = fab.box();
 
             // create coordset and topo
-	    FabToBlueprintTopology(geom, fab, ngrow, mesh);
+	    FabToBlueprintTopology(verbosity, geom, fab, ngrow, mesh);
 
 
             // add the nesting relationship
             if(n_levels > 1)
             {
-
-	      for (int i = 0; i < n_levels; i++)
-		amrex::Print() << "is box_array ok: " <<  box_arrays[i]->ok() << " " << "is box ok: " << box.ok() << "\n"; 
 	      
+	      if (verbosity > 0){
+		for (int i = 0; i < n_levels; i++)
+		  amrex::Print() << "is box_array ok: " <<  box_arrays[i]->ok() << " " << "is box ok: " << box.ok() << "\n"; 
+	      }
 	      Nestsets(level, n_levels, fab, box_arrays, ref_ratios, box_offsets, nest_set);
 
 
@@ -468,7 +475,8 @@ MultiLevelToParaviewConduitBlueprint (int n_levels,
 
 }
 
-void FabToBlueprintTopology(const amrex::Geometry& geom,
+  void FabToBlueprintTopology(int verbosity,
+			    const amrex::Geometry& geom,
 			    const amrex::FArrayBox& fab,
 			    int ngrow, 
 			    conduit_cpp::Node &res)
@@ -513,22 +521,23 @@ void FabToBlueprintTopology(const amrex::Geometry& geom,
     int k_min = dims > 2 ? fab_box.smallEnd(2) : 0;
     int k_max = dims > 2 ? fab_box.bigEnd(2) : 0;
 
-    amrex::Print() << "x : " << i_min << " " << i_max << "\n";
-    amrex::Print() << "y : " << j_min << " " << j_max << "\n";
-    amrex::Print() << "z : " << k_min << " " << k_max << "\n";
+
 
     int nx = (i_max - i_min + 1);
     int ny = (j_max - j_min + 1);
     int nz = dims > 2 ? (k_max - k_min +1) : 1;
 
     amrex::Real x_min = level_x_min + level_dx * i_min;
-    //float64 x_max = level_x_min + level_dx * i_max;
-
     amrex::Real y_min = level_y_min + level_dy * j_min;
-    //float64 y_max = level_y_min + level_dy * j_max;
-
     amrex::Real z_min = dims > 2 ? level_z_min + level_dz * k_min : 0.0;
-    //float64 z_max = dims > 2 ? level_z_min + level_dz * k_max : 0.0;
+
+
+    if (verbosity>0){
+      amrex::Print() << "x : " << i_min << " " << i_max << "\n";
+      amrex::Print() << "y : " << j_min << " " << j_max << "\n";
+      amrex::Print() << "z : " << k_min << " " << k_max << "\n";
+    }
+
 
     // create uniform coordset
     // (which also holds all implicit details needed for the topology)
