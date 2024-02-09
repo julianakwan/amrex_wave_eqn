@@ -34,7 +34,7 @@ namespace CatalystAdaptor
 /*   conduit_cpp::Node node; */
 
 //  void Initialize(int argc, char* argv[]); 
-  void Initialize(std::string filename, std::string catalyst_options); 
+  void Initialize(std::string filename, std::string catalyst_options, std::string paraview_impl_dir); 
 
 /*   // Populate the catalyst_execute argument based on the "execute" protocol [3]. */
 /*   // [3] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-execute */

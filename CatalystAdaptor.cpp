@@ -41,7 +41,7 @@ namespace CatalystAdaptor
  * `conduit_node`. However, this example shows that one can
  * indeed use Catalyst's C++ API, if the developer so chooses.
  */
-  void Initialize(std::string filename, std::string catalyst_options)
+  void Initialize(std::string filename, std::string catalyst_options, std::string paraview_impl_dir)
 {
   // Populate the catalyst_initialize argument based on the "initialize" protocol [1].
   // [1] https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-initialize
@@ -66,8 +66,8 @@ namespace CatalystAdaptor
   // accompanying CMakeLists.txt). We could however defined them via
   // environmental variables  see [1].
   node["catalyst_load/implementation"] = "paraview";
-  //  node["catalyst_load/search_paths/paraview"] = PARAVIEW_IMPL_DIR;
-  node["catalyst_load/search_paths/paraview"] = "/rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst";
+  node["catalyst_load/search_paths/paraview"] = paraview_impl_dir;
+  //  node["catalyst_load/search_paths/paraview"] = "/rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst";
 
 
   catalyst_status err = catalyst_initialize(conduit_cpp::c_node(&node));

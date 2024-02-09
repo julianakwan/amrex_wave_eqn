@@ -1,7 +1,8 @@
 max_step = 10
 stop_time = 2
 catalyst_input_script = /home/dc-kwan1/amrex/amrex-tutorials/amrex_wave_eqn/catalyst_pipeline_with_rendering.py
-catalyst_options = --enable-live
+paraview_directory=/rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst
+#catalyst_options = --enable-live
 
 
 geometry.is_periodic =  1  1  1                    
@@ -27,7 +28,7 @@ amr.plot_int = 1         # write plotfile every ? steps
 amr.plot_vars = ALL
 amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/insitu-viz/plt
 
-wave.v = 1                      # prints extra outputs incl. Conduit Blueprint files
+wave.v = 0                      # prints extra outputs incl. Conduit Blueprint files
 wave.rk_order = 4
 wave.cfl = 0.2
 wave.nfields = 1

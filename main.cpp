@@ -32,12 +32,13 @@ int main (int argc, char* argv[])
     ParmParse pp;
     std::string catalyst_filename; 
     std::string catalyst_options;
-    int catalyst_verbosity_level; 
+    std::string paraview_impl_dir;
 
     pp.query("catalyst_input_script", catalyst_filename);
     pp.query("catalyst_options", catalyst_options);
+    pp.query("paraview_directory", paraview_impl_dir);
 
-    CatalystAdaptor::Initialize(catalyst_filename, catalyst_options);
+    CatalystAdaptor::Initialize(catalyst_filename, catalyst_options, paraview_impl_dir);
 #endif
 
 
