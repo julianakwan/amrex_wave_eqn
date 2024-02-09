@@ -11,12 +11,13 @@ There are several properties of the scalar fields that are set in the input para
 * wave.initial_width - intial width of Gaussian pulse, again one value per scalar field
 * wave.scalar_mass - scalar field mass, one per scalar field
 * wave.tagging_criterion - value (in first derivative) at which cells will be tagged. 
+* wave.v - verbosity level. Setting > 1 will output Conduit grid information and Conduit Blueprint files. 
 
 For in-situ visualizations, you will also need to set:
-*catalyst_input_script - path to the Python script with ParaView commands
-*catalyst_options (optional) - pass optional flags to ParaView e.g. --enable-live for ParaView Live
+* catalyst_input_script - path to the Python script with ParaView commands
+* catalyst_options (optional) - pass optional flags to ParaView e.g. --enable-live for ParaView Live
 
-For debugging, you might want to set wave.v > 1 to output Conduit grid information and Conduit Blueprint files. 
+
 
 Build Instructions: 
 * Clone the AMReX repository [here](https://github.com/AMReX-Codes/amrex). AMReX has the following requirements: GNU make >=3.81, Python >=2.7, C++ compiler with C++17 support, Fortran compiler with Fortran 2003 standard support
