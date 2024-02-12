@@ -47,15 +47,20 @@ AmrLevelWave::initData ()
 
 	
         constexpr Real Pi = 3.1415926535897932384626;
-	//	constexpr Real k_r = 1;
-	//	constexpr Real omega = 1;
+		// constexpr Real k_r = 1;
+		// constexpr Real omega = 1;
 	for (int n = 0; n < nfields; n++)
 	  {
 	    //	    snew[bi](i,j,k,2*n) = 0.0;
 	    //	    snew[bi](i,j,k,2*n+1) = std::exp(-16.*rr2) * std::pow(std::cos(Pi*rr2),6);
 
-	    snew[bi](i,j,k,0) = std::cos(k_r*rr2);
-	    snew[bi](i,j,k,1) = omega*std::sin(k_r*rr2);
+	    // snew[bi](i,j,k,0) = std::cos(k_r*rr2);
+	    // snew[bi](i,j,k,1) = omega*std::sin(k_r*rr2);
+
+
+	    snew[bi](i,j,k,0) = 1+ampl[0]*std::exp(-width[0]*rr2);
+	    snew[bi](i,j,k,1) = 0;
+
 
 	  }
 

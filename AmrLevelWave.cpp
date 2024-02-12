@@ -250,13 +250,8 @@ AmrLevelWave::post_timestep (int iteration)
 	//Average between cell faces, also removes need for fill patch;
 	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
 
-	//	Derive("exact_soln", t, S_crse);
-
-	//		WriteMultiLevelPlotfile(output_fname, amr.max_levels, 
     }
 
-    //    const std::string& pltfile = amrex::Concatenate("plt",iteration,5);
-    //    WriteSingleLevelPlotfile(pltfile, phi_old, {"phi"}, geom, time, 0);
 
 
     AmrLevel::post_timestep(iteration);

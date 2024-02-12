@@ -28,7 +28,8 @@ AmrLevelWave::Potential(Real phi2)
   Real V = 0;
   //  Real scalar_mass = 0;
 
-  V = 0.5*scalar_mass*scalar_mass*phi2;
+  //  V = 0.5*scalar_mass*scalar_mass*phi2;
+  V = std::sin(phi2);
 
   return V;
 }
@@ -73,7 +74,7 @@ AmrLevelWave::computeRHS (MultiFab& dSdt, MultiFab const& S)
 
 	  f(i,j,k,2*n+1) = AMREX_D_TERM(lapx, +lapy, +lapz);
 
-	  f(i,j,k,2*n+1) -= Potential(phi2);
+	  f(i,j,k,2*n+1) -= Potential(s(i,j,k,0));
 
 	}
 
