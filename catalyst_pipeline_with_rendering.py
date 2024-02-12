@@ -133,7 +133,7 @@ options.ExtractsOutputDirectory = "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/A
 
 if "--enable-live" in catalyst.get_args():
   options.EnableCatalystLive = 1
-  options.LiveTrigger = 'Timestep'
+  options.CatalystLiveTrigger = 'Timestep'
 
 
 # Greeting to ensure that ctest knows this script is being imported
