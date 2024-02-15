@@ -60,6 +60,7 @@ AmrLevelWave::computeRHS (MultiFab& dSdt, MultiFab const& S)
 	phi2 += std::pow(s(i,j,k,2*n),2);
 
 
+
       for (int n = 0; n < nfields; n++)
 	{
 
@@ -74,7 +75,7 @@ AmrLevelWave::computeRHS (MultiFab& dSdt, MultiFab const& S)
 
 	  f(i,j,k,2*n+1) = AMREX_D_TERM(lapx, +lapy, +lapz);
 
-	  f(i,j,k,2*n+1) -= Potential(s(i,j,k,0));
+	  f(i,j,k,2*n+1) -= Potential(s(i,j,k,2*n));
 
 	}
 

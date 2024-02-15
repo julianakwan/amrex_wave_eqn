@@ -1,10 +1,10 @@
-max_step = 10
-stop_time = 2
+max_step = 200
+stop_time = 10
 
 geometry.is_periodic =  1  1  1                    
 geometry.coord_sys   =  0       # 0 => cart
 geometry.prob_lo     =  0.0  0.0  0.0
-geometry.prob_hi     =  1.0  1.0  1.0         
+geometry.prob_hi     =  100.0  100.0  100.0         
 
 amr.n_cell           =  128 128 128
 
