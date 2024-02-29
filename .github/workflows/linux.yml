@@ -15,7 +15,7 @@ jobs:
     - name: Checkout AMReX
       uses: actions/checkout@v4
       with:
-      respository: AMReX-Codes/amrex
+      repository: AMReX-Codes/amrex
       path: amrex
 
     - name: Checkout ${{ github.repository }}
