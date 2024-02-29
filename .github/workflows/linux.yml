@@ -8,7 +8,9 @@ jobs:
   build_wave_eqn:
     name: GNU@7.5 C++14 [tutorials]
     runs-on: ubuntu-20.04
-    env: {CXXFLAGS: "-Werror -Wshadow -Woverloaded-virtual -Wunreachable-code -fno-operator-names"}
+    env:
+      {CXXFLAGS: "-Werror -Wshadow -Woverloaded-virtual -Wunreachable-code -fno-operator-names"}
+      AMREX_HOME: ${{ github.workspace }}/amrex
     steps:
     - uses: actions/checkout@v3
     - name: Dependencies
