@@ -16,19 +16,21 @@ jobs:
       uses: actions/checkout@v4
       with:
        repository: AMReX-Codes/amrex
-       path: amrex
+       path: ${{ github.workspace }}/amrex
 
     - name: Checkout ${{ github.repository }}
       uses: actions/checkout@v4
       with:
-       path: amrex_wave_eqn
+       path: ${{ github.workspace }}/amrex_wave_eqn
       
     - name: Dependencies
       run: .github/workflows/dependencies/dependencies.sh
       
     - name: Build & Install
       run: |
-          make -j 4 ${{ env.AMREX_HOME }}	   
+          make -j 4 ${{ env.AMREX_HOME }}
+
+
 #      	   cmake -S . -B build             \
 #            -DCMAKE_BUILD_TYPE=Debug    \
 #            -DCMAKE_VERBOSE_MAKEFILE=ON \
