@@ -12,9 +12,18 @@ jobs:
 #      {CXXFLAGS: "-Werror -Wshadow -Woverloaded-virtual -Wunreachable-code -fno-operator-names"}
       AMREX_HOME: ${{ github.workspace }}/amrex
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout AMReX
+      uses: actions/checkout@v4
+      with:
+        respository: AMReX-Codes/amrex
+	path: amrex
+
+    - name: Checkout ${{ github.repository }}
+      uses: actions/checkout@v4
+      
     - name: Dependencies
       run: .github/workflows/dependencies/dependencies.sh
+      
     - name: Build & Install
       run: |
           make -j 4	   
