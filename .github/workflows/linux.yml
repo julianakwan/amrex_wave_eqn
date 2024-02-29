@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
 
   # Build all tutorials
-  tutorials_build:
+  build_wave_eqn:
     name: GNU@7.5 C++14 [tutorials]
     runs-on: ubuntu-20.04
     env: {CXXFLAGS: "-Werror -Wshadow -Woverloaded-virtual -Wunreachable-code -fno-operator-names"}
@@ -15,14 +15,14 @@ jobs:
       run: .github/workflows/dependencies/dependencies.sh
     - name: Build & Install
       run: |
-         cmake -S . -B build             \
-            -DCMAKE_BUILD_TYPE=Debug    \
-            -DCMAKE_VERBOSE_MAKEFILE=ON \
-            -DAMReX_LINEAR_SOLVERS=ON   \
-            -DAMReX_FORTRAN=ON          \
-            -DAMReX_FORTRAN_INTERFACES=ON 
-
-        cmake --build build -j 2
+      	   make -j 4	   
+#      	   cmake -S . -B build             \
+#            -DCMAKE_BUILD_TYPE=Debug    \
+#            -DCMAKE_VERBOSE_MAKEFILE=ON \
+#            -DAMReX_LINEAR_SOLVERS=ON   \
+#            -DAMReX_FORTRAN=ON          \
+#            -DAMReX_FORTRAN_INTERFACES=ON 
+#        cmake --build build -j 2
 #        cmake --build build -j 2 --target pyamrex_pip_install
 #    - name: Run Python
 #      run: |

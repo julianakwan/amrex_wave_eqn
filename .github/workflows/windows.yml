@@ -11,16 +11,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build & Install
       run: |
-        cmake -S . -B build   `
-              -DCMAKE_BUILD_TYPE=Debug      `
-              -DBUILD_SHARED_LIBS=ON        `
-              -DCMAKE_VERBOSE_MAKEFILE=ON   `
-              -DAMReX_FORTRAN=OFF           `
-              -DAMReX_MPI=OFF               `
-              -DAMReX_LINEAR_SOLVERS=ON     `
-              -DAMReX_EB=ON                 `
-              -DAMReX_PARTICLES=ON
-        cmake --build build --config Debug -j 2
+      	make -j 4 
 
   # Build all tutorials
   tutorials_clang:
@@ -33,15 +24,5 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-        cmake -S . -B build   ^
-              -T "ClangCl"    ^
-              -DCMAKE_BUILD_TYPE=Release    ^
-              -DBUILD_SHARED_LIBS=ON        ^
-              -DCMAKE_VERBOSE_MAKEFILE=ON   ^
-              -DAMReX_FORTRAN=OFF           ^
-              -DAMReX_MPI=OFF               ^
-              -DAMReX_OMP=ON                ^
-              -DAMReX_LINEAR_SOLVERS=ON     ^
-              -DAMReX_EB=ON                 ^
-              -DAMReX_PARTICLES=ON
-        cmake --build build --config Release -j 2
+	make - j 4 
+
