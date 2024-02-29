@@ -17,6 +17,5 @@ jobs:
     - name: Build & Install
       run: |
         export LIBRARY_PATH=/usr/local/opt/gcc/lib/gcc/current
-
 	make -j 4 
 
