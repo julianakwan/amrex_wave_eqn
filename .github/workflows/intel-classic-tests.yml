@@ -25,12 +25,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: GRChombo/Chombo
-        path: Chombo
+        path: ${{ github.workspace }}/Chombo
 
     - name: Checkout GRChombo
       uses: actions/checkout@v4
       with:
-        path: GRChombo
+        path: ${{ github.workspace }}/GRChombo
 
     - name: Update package manager database
       id: update-database
