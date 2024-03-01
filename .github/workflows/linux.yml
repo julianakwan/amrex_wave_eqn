@@ -28,7 +28,7 @@ jobs:
       
     - name: Build & Install
       run: |
-          make -j 4 ${{ env.AMREX_HOME }}
+          make -j 4 
 
 
 #      	   cmake -S . -B build             \
