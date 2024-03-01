@@ -30,6 +30,7 @@ jobs:
     - name: Checkout GRChombo
       uses: actions/checkout@v4
       with:
+        repository: GRChombo
         path: ${{ github.workspace }}/GRChombo
 
     - name: Update package manager database
