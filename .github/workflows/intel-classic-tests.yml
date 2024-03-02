@@ -18,7 +18,7 @@ jobs:
     env:
       CHOMBO_HOME: ${{ github.workspace }}/Chombo/lib
       OMP_NUM_THREADS: 1
-      BUILD_ARGS: MPI=${{ matrix.mpi}} OPT=${{ matrix.opt }} DEBUG=${{ matrix.debug }} FC=ifx
+      BUILD_ARGS: MPI=${{ matrix.mpi}} OPT=${{ matrix.opt }} DEBUG=${{ matrix.debug }}
 
     steps:
     - name: Checkout Chombo
@@ -55,7 +55,7 @@ jobs:
         | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
         echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
         sudo apt-get update
-        sudo apt-get -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-compiler-dpcpp-cpp-classic-fortran-shared-runtime-2022.0.2 intel-oneapi-mkl intel-oneapi-openmp
+        sudo apt-get -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-compiler-dpcpp-cpp-classic-fortran intel-oneapi-mkl intel-oneapi-openmp
       working-directory: /tmp
  
     - name: Instal Intel MPI
