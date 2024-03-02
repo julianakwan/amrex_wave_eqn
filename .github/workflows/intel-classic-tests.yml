@@ -56,7 +56,7 @@ jobs:
         echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
         sudo apt-get update
         sudo -E apt-cache pkgnames intel | grep fortran
-        sudo apt-get -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-compiler-dpcpp-cpp-classic-fortran intel-oneapi-mkl intel-oneapi-openmp
+        sudo apt-get -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-compiler-fortran intel-oneapi-mkl intel-oneapi-openmp
       working-directory: /tmp
  
     - name: Instal Intel MPI
