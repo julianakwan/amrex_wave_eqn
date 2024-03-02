@@ -21,8 +21,8 @@ For in-situ visualizations, you will also need to set:
 
 Build Instructions: 
 * Clone the AMReX repository [here](https://github.com/AMReX-Codes/amrex). AMReX has the following requirements: GNU make >=3.81, Python >=2.7, C++ compiler with C++17 support, Fortran compiler with Fortran 2003 standard support
-* Clone this repository. For the in-situ component, you will also need ParaView >= 5.9, Conduit, Catalyst 2.0
-* In this directory for this repo, edit the GNUmakefile for your system - here you can choose your compiler by changing the COMP variable (either gnu, intel or intel-llvm). Be sure to also set the location to AMReX in AMREX_HOME. You can also also change USE_CATALYST to TRUE for in-situ visualizations. If you want to debug by outputting Conduit Blueprint files you will also need to set USE_CONDUIT to TRUE. (Also set the verbosity level.)
+* Clone this repository. For the in-situ component, you will also need ParaView >= 5.9, Conduit, Catalyst 2.0 and make sure that PARAVIEW_DIR is set to the install directory. 
+* In the directory for this repo, edit the GNUmakefile for your system - here you can choose your compiler by changing the COMP variable (either gnu, intel or intel-llvm). Be sure to also set the location to AMReX in AMREX_HOME. You can also also change USE_CATALYST to TRUE for in-situ visualizations. If you want to debug by outputting Conduit Blueprint files you will also need to set USE_CONDUIT to TRUE. (Also set the verbosity level.)
 * If USE_CATALYST is set to TRUE, you will need to define $PARAVIEW_DIR such athat it points to the directory where ParaView and Catalyst are installed, i.e. $PARAVIEW_DIR/include/Catalyst-2.0 should contain the Catalyst2 header files. 
 * Then run make 
 
