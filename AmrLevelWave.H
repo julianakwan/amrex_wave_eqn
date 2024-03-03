@@ -2,7 +2,7 @@
 #define AMRLEVEL_WAVE_H_
 
 #include <AMReX_AmrLevel.H>
-
+#include "Potential.H"
 
 enum StateType { State_Type = 0, NUM_STATE_TYPE };
 
@@ -88,7 +88,7 @@ public:
 
   void Derive(const std::string &name, amrex::Real time, amrex:: MultiFab const &S, amrex::MultiFab &S_der);
 
-    amrex::Real Potential (amrex::Real phi);
+  //    amrex::Real Potential (amrex::Real phi);
 
 private:
 
@@ -104,8 +104,9 @@ private:
     static amrex::Vector<float> width;
     static int nfields;
     static amrex::Real scalar_mass; 
-    static amrex::Real k_r; 
-    static amrex::Real omega; 
+    static amrex::Real k_r;
+    static amrex::Real alpha; 
+
 
     //! Function to read parameters from input file.
     static void read_params ();

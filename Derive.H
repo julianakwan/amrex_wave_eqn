@@ -1,6 +1,8 @@
 #include <AMReX_BLFort.H>
 #include <AMReX_FArrayBox.H>
 #include <AMReX_Geometry.H>
+#include <AMReX_ParmParse.H>
+#include <InitialConditions.H>
 
 
 

@@ -5,12 +5,18 @@
 
 #### import the simple module from the paraview
 from paraview.simple import *
+import glob
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+#get filenames
+filenames = glob.glob("/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt_cell_quartic_log_err*")
 # create a new 'AMReX/BoxLib Grid Reader'
-plt00000 = AMReXBoxLibGridReader(registrationName='plt00000*', FileNames=['/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00000', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00001', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00002', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00003', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00004', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00005', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00006', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/p
-lt00007', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00008', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00009', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00010', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00011', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00012', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00013', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00014', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00015', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00016', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00017', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00018', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00019', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00020', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00021', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00022', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00023', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00024', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00025', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00026', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00027', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00028', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00029', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00030', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00031', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00032', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00033', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00034', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00035', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00036', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00037', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00038', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00039', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00040', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00041', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00042', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00043', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00044', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00045', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00046', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00047', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00048', '/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt00049']) 
+
+
+print(filenames)
+
+plt00000 = AMReXBoxLibGridReader(registrationName='plt00000*', FileNames=filenames)
 plt00000.CellArrayStatus = []
 
 # get animation scene
@@ -62,7 +68,7 @@ materialLibrary1 = GetMaterialLibrary()
 renderView1.Update()
 
 # set scalar coloring
-ColorBy(plt00000Display, ('CELLS', 'phi0'))
+ColorBy(plt00000Display, ('CELLS', 'frac_err'))
 
 # rescale color and/or opacity maps used to include current data range
 plt00000Display.RescaleTransferFunctionToDataRange(True, False)
@@ -71,13 +77,17 @@ plt00000Display.RescaleTransferFunctionToDataRange(True, False)
 plt00000Display.SetScalarBarVisibility(renderView1, True)
 
 # get color transfer function/color map for 'phi0'
-LUT = GetColorTransferFunction('phi0')
+LUT = GetColorTransferFunction('frac_err')
 
 # get opacity transfer function/opacity map for 'phi0'
-PWF = GetOpacityTransferFunction('phi0')
+PWF = GetOpacityTransferFunction('frac_err')
 
 # get 2D transfer function for 'phi0'
-TF2D = GetTransferFunction2D('phi0')
+TF2D = GetTransferFunction2D('frac_err')
+
+#Rescale transfer functions
+LUT.RescaleTransferFunction(-2.0,1.0)
+PWF.RescaleTransferFunction(-2.0,1.0)
 
 # change representation type
 plt00000Display.SetRepresentationType('Surface')
@@ -102,7 +112,7 @@ slice1Display = Show(slice1, renderView1, 'GeometryRepresentation')
 
 # trace defaults for the display properties.
 slice1Display.Representation = 'Surface'
-slice1Display.ColorArrayName = ['CELLS', 'phi0']
+slice1Display.ColorArrayName = ['CELLS', 'frac_err']
 slice1Display.LookupTable = LUT
 slice1Display.SelectTCoordArray = 'None'
 slice1Display.SelectNormalArray = 'None'
@@ -149,20 +159,20 @@ layout1 = GetLayout()
 # saving layout sizes for layouts
 
 # layout/tab size in pixels
-layout1.SetSize(819, 552)
+layout1.SetSize(819, 539)
 
 #-----------------------------------
 # saving camera placements for views
 
 # current camera placement for renderView1
-renderView1.CameraPosition = [0.5, 0.5, 3.8460652149512318]
-renderView1.CameraFocalPoint = [0.5, 0.5, 0.5]
-renderView1.CameraParallelScale = 0.8660254037844386
+renderView1.CameraPosition = [50.0, 50.0, 384.60652149512318]
+renderView1.CameraFocalPoint = [50., 50., 50.]
+renderView1.CameraParallelScale = 86.60254037844386
 
 #--------------------------------------------
 # uncomment the following to render all views
 #RenderAllViews()
 # alternatively, if you want to write images, you can use SaveScreenshot(...).
 #SaveScreenshot("plot.png")
-SaveAnimation('animation.jpeg', GetActiveView(), FrameWindow=[1,100], FrameRate=1)
+SaveAnimation('/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/frac_err.jpeg', GetActiveView(), FrameWindow=[1,100], FrameRate=1)
 #AnimateReader(plt00000, filename="test_movie.jpeg")

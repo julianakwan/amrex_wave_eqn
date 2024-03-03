@@ -1,10 +1,10 @@
-max_step = 200
-stop_time = 10
+max_step = 10
+stop_time = 2
 
 geometry.is_periodic =  1  1  1                    
 geometry.coord_sys   =  0       # 0 => cart
 geometry.prob_lo     =  0.0  0.0  0.0
-geometry.prob_hi     =  100.0  100.0  100.0         
+geometry.prob_hi     =  1.0  1.0  1.0         
 
 amr.n_cell           =  128 128 128
 
@@ -23,14 +23,14 @@ amr.plot_files_output = 1  # write plot files or not
 amr.plot_int = 1         # write plotfile every ? steps
 amr.plot_vars = ALL
 amr.derive_plot_vars = ALL   #also write out derived parameters
-amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_cell_quartic_interp/plt
+amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/test_2fields/plt_test_potential_
 
 
 wave.rk_order = 4
 wave.cfl = 0.2
-wave.nfields = 1
-wave.initial_amplitude = 10.0 
-wave.initial_width = 0.01 
-wave.scalar_mass = 0
-wave.k_r = 1.0
-wave.omega = 1.0
+wave.nfields = 2
+wave.initial_amplitude = 10.0 5.0
+wave.initial_width = 0.01 0.05
+wave.scalar_mass = 1
+wave.wave_vector = 100.0
+wave.alpha = 0.7

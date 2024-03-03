@@ -17,7 +17,7 @@ int AmrLevelWave::nfields = 1;
 Real AmrLevelWave::scalar_mass = 1.0;
 int AmrLevelWave::ncomp = nfields*2;
 Real AmrLevelWave::k_r = 1.0;
-Real AmrLevelWave::omega = 1.0;
+Real AmrLevelWave::alpha = 1.0;
 Vector<std::string> AmrLevelWave::diagnostics;//this is for error checking
 
 
@@ -84,7 +84,7 @@ AmrLevelWave::variableSetUp ()
 
     desc_lst.addDescriptor(State_Type, IndexType::TheCellType(),
                            StateDescriptor::Point, nghost, ncomp,
-                           &cell_quartic_interp);
+                           &quartic_interp);
 
 
     // int lo_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::ext_dir,    // external Dirichlet
@@ -135,7 +135,7 @@ AmrLevelWave::variableSetUp ()
 		   //		   amrex::DeriveFuncFab(),		   
 		   derive_func_fab,
 		   [=](const amrex::Box &box) { return amrex::grow(box, nghost);},
-    		   &amrex::cell_quartic_interp);
+    		   &amrex::quartic_interp);
 
     derive_lst.addComponent("frac_error", desc_lst, State_Type, 0, 1);
 
@@ -238,17 +238,17 @@ AmrLevelWave::post_timestep (int iteration)
         Real t = get_state_data(State_Type).curTime();
 
         IntVect ratio = parent->refRatio(Level());
-        AMREX_ASSERT(ratio == 2 || ratio == 4);
-	       if (ratio == 2) {
-	           // Need to fill one ghost cell for the high-order interpolation below
-	           FillPatch(fine_level, S_fine, 1, t, State_Type, 0, ncomp);
-	       }
+        // AMREX_ASSERT(ratio == 2 || ratio == 4);
+	//        if (ratio == 2) {
+	//            // Need to fill one ghost cell for the high-order interpolation below
+	//            FillPatch(fine_level, S_fine, 1, t, State_Type, 0, ncomp);
+	//        }
 
 	
 	//Original interpolation:	
-        FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
+	//        FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
 	//Average between cell faces, also removes need for fill patch;
-	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
+	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
 
     }
 
@@ -321,7 +321,7 @@ AmrLevelWave::read_params ()
     pp.getarr("initial_width", width,0,nfields); 
     pp.query("scalar_mass", scalar_mass); 
     pp.query("wave_vector", k_r);
-    pp.query("omega", omega); 
+    pp.query("alpha", alpha);  
 
     ncomp = 2*nfields;
 
