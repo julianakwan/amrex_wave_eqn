@@ -10,10 +10,23 @@ jobs:
   tests-macos:
     name: AppleClang@14.0 GFortran@12.2 [tutorials]
     runs-on: macos-latest
+    
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout AMReX
+      uses: actions/checkout@v4
+      with:
+       repository: AMReX-Codes/amrex
+       path: ${{ github.workspace }}/amrex
+
+    steps:
+    - name: Checkout ${{ github.repository }}
+      uses: actions/checkout@v4
+      with:
+       path: ${{ github.workspace }}/amrex_wave_eqn
+
     - name: Dependencies
-      run: .github/workflows/dependencies/dependencies_mac.sh
+      run: ${{ github.workspace }}/amrex_wave_eqn/.github/workflows/dependencies/dependencies_mac.sh
+      
     - name: Build & Install
       run: |
         export LIBRARY_PATH=/usr/local/opt/gcc/lib/gcc/current
