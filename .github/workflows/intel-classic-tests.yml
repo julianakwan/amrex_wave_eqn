@@ -55,8 +55,8 @@ jobs:
         | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
         echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
         sudo apt-get update
-        sudo apt-get -y install intel-hpckit-2023.1.0
-        #        sudo apt-get -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-compiler-fortran intel-oneapi-mkl intel-oneapi-openmp
+        #sudo apt-get -y install intel-hpckit-2023.1.0
+        sudo apt-get -y install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-compiler-fortran intel-oneapi-mkl intel-oneapi-openmp
       working-directory: /tmp
  
     - name: Instal Intel MPI
