@@ -16,9 +16,10 @@ class InitialConditions
   const amrex::Real m_omega; 
 
   public:
-  InitialConditions(const amrex::Real alpha, const amrex::Real k_r):m_alpha(alpha), m_beta(1.0-alpha*alpha), m_k_r(k_r), m_omega(k_r){};
+  InitialConditions(const amrex::Real alpha, const amrex::Real k_r):m_alpha(alpha), m_beta(std::sqrt(1.0-alpha*alpha)), m_k_r(k_r), m_omega(k_r){};
 
   amrex::Real breather_solution(const amrex::Real x, const amrex::Real t) const;
+  amrex::Real breather_solution(const amrex::Real x, const amrex::Real y, const amrex::Real z, const amrex::Real t) const;
   amrex::Real breather_solution_deriv(const amrex::Real x, const amrex::Real t) const;
 
 

@@ -12,10 +12,17 @@ amrex::Real Potential::phi_sq(const amrex::Vector<amrex::Real> phi) const
 
 }
 
-amrex:: Real Potential::sine_gordon(const amrex::Real phi) const
+amrex:: Real Potential::sine_gordon(const amrex::Vector<amrex::Real> phi) const
 {
+  
+  amrex::Real total_phi = 0;
 
-  return std::sin(phi); 
+  for (auto it = phi.begin(); it != phi.end(); ++it)  //for (int i : phi)
+    total_phi += (*it)*(*it);   
+
+  total_phi = std::sqrt(total_phi);
+
+  return std::sin(total_phi); 
 
 }
 

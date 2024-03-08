@@ -15,7 +15,7 @@ class Potential
   ~Potential(){};
   
   amrex::Real phi_sq(const amrex::Vector<amrex::Real> phi) const;
-  amrex::Real sine_gordon(const amrex::Real phi) const;
+  amrex::Real sine_gordon(const amrex::Vector<amrex::Real> phi) const;
 
   
 };

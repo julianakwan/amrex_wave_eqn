@@ -84,7 +84,7 @@ AmrLevelWave::variableSetUp ()
 
     desc_lst.addDescriptor(State_Type, IndexType::TheCellType(),
                            StateDescriptor::Point, nghost, ncomp,
-                           &quartic_interp);
+                           &cell_quartic_interp);
 
 
     // int lo_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::ext_dir,    // external Dirichlet
@@ -135,7 +135,7 @@ AmrLevelWave::variableSetUp ()
 		   //		   amrex::DeriveFuncFab(),		   
 		   derive_func_fab,
 		   [=](const amrex::Box &box) { return amrex::grow(box, nghost);},
-    		   &amrex::quartic_interp);
+    		   &amrex::cell_quartic_interp);
 
     derive_lst.addComponent("frac_error", desc_lst, State_Type, 0, 1);
 
@@ -238,17 +238,17 @@ AmrLevelWave::post_timestep (int iteration)
         Real t = get_state_data(State_Type).curTime();
 
         IntVect ratio = parent->refRatio(Level());
-        // AMREX_ASSERT(ratio == 2 || ratio == 4);
-	//        if (ratio == 2) {
-	//            // Need to fill one ghost cell for the high-order interpolation below
-	//            FillPatch(fine_level, S_fine, 1, t, State_Type, 0, ncomp);
-	//        }
+        AMREX_ASSERT(ratio == 2 || ratio == 4);
+	       if (ratio == 2) {
+	           // Need to fill one ghost cell for the high-order interpolation below
+	           FillPatch(fine_level, S_fine, 1, t, State_Type, 0, ncomp);
+	       }
 
 	
 	//Original interpolation:	
-	//        FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
+	FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
 	//Average between cell faces, also removes need for fill patch;
-	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
+	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
 
     }
 

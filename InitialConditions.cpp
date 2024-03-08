@@ -16,6 +16,19 @@ amrex::Real InitialConditions::breather_solution(const amrex::Real x, const amre
 
 }
 
+amrex::Real InitialConditions::breather_solution(const amrex::Real x, const amrex::Real y, const amrex::Real z, const amrex::Real t) const
+{
+  //Sine Gordon 3D psudo-breather solution from arXiv:1212.2716
+    
+
+  return  4*4*4*
+    std::atan(m_alpha*std::sin(m_beta*t)/m_beta/std::cosh(m_alpha*x))*
+    std::atan(m_alpha*std::sin(m_beta*t)/m_beta/std::cosh(m_alpha*y))*
+    std::atan(m_alpha*std::sin(m_beta*t)/m_beta/std::cosh(m_alpha*z));
+
+}
+
+
 amrex:: Real InitialConditions::breather_solution_deriv(const amrex::Real x, const amrex::Real t) const
 {
   //First derivative of Sine Gordon 1D breather solution     
@@ -34,6 +47,9 @@ amrex:: Real InitialConditions::breather_solution_deriv(const amrex::Real x, con
   return -4*m_alpha*m_beta*numerator/denominator; 
 
 }
+
+
+
 
 amrex::Real InitialConditions::travelling_wave(const amrex::Real x, const amrex:: Real y, const amrex:: Real z, const amrex::Real t) const
 {

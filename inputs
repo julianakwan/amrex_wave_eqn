@@ -1,15 +1,15 @@
-max_step = 10
-stop_time = 2
+max_step = 100
+stop_time = 20
 
 geometry.is_periodic =  1  1  1                    
 geometry.coord_sys   =  0       # 0 => cart
 geometry.prob_lo     =  0.0  0.0  0.0
-geometry.prob_hi     =  1.0  1.0  1.0         
+geometry.prob_hi     =  100.0  100.0  100.0         
 
-amr.n_cell           =  128 128 128
+amr.n_cell           =  256 256 256
 
 amr.v = 1
-amr.max_level       = 1       # maximum level number allowed
+amr.max_level       = 3       # maximum level number allowed
 amr.ref_ratio       = 2 2 2 2 # refinement ratio
 amr.regrid_int      = 2       # how often to regrid
 amr.blocking_factor_x = 16    # block factor in x-direction
@@ -23,14 +23,14 @@ amr.plot_files_output = 1  # write plot files or not
 amr.plot_int = 1         # write plotfile every ? steps
 amr.plot_vars = ALL
 amr.derive_plot_vars = ALL   #also write out derived parameters
-amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/test_2fields/plt_test_potential_
+amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/sine_gordon_3d_breather/plt_hi_res_cell_quartic_
 
 
 wave.rk_order = 4
 wave.cfl = 0.2
-wave.nfields = 2
-wave.initial_amplitude = 10.0 5.0
-wave.initial_width = 0.01 0.05
-wave.scalar_mass = 1
+wave.nfields = 1
+wave.initial_amplitude = 10.0 10.0
+wave.initial_width = 0.01 0.01
+wave.scalar_mass = 1 1
 wave.wave_vector = 100.0
-wave.alpha = 0.7
+wave.alpha = 0.7 
