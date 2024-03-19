@@ -10,6 +10,8 @@ jobs:
   tests-macos:
     name: AppleClang@14.0 GFortran@12.2 [tutorials]
     runs-on: macos-latest
+    env:
+      AMREX_HOME: ${{ github.workspace }}/amrex
     
     steps:
     - name: Checkout AMReX
