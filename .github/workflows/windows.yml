@@ -7,22 +7,49 @@ jobs:
   tests_msvc:
     name: MSVC C++17 w/o Fortran w/o MPI
     runs-on: windows-latest
+    env:
+      AMREX_HOME: ${{ github.workspace }}/amrex
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout AMReX
+      uses: actions/checkout@v4
+      with:
+       repository: AMReX-Codes/amrex
+       path: ${{ github.workspace }}/amrex
+
+    - name: Checkout ${{ github.repository }}
+      uses: actions/checkout@v4
+      with:
+       path: ${{ github.workspace }}/amrex_wave_eqn
+
     - name: Build & Install
       run: |
+        cd ${{ github.workspace }}/amrex_wave_eqn
         make -j 4 
 
   # Build all tutorials
   tutorials_clang:
     name: Clang C++17 w/o Fortran w/o MPI
     runs-on: windows-latest
+    env:
+      AMREX_HOME: ${{ github.workspace }}/amrex
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout AMReX
+      uses: actions/checkout@v4
+      with:
+       repository: AMReX-Codes/amrex
+       path: ${{ github.workspace }}/amrex
+
+    - name: Checkout ${{ github.repository }}
+      uses: actions/checkout@v4
+      with:
+       path: ${{ github.workspace }}/amrex_wave_eqn
+
     - uses: seanmiddleditch/gha-setup-ninja@master
     - name: Build & Install
       shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-	make - j 4 
+        cd ${{ github.workspace }}/amrex_wave_eqn
+        make - j 4 
 
