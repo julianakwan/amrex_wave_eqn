@@ -75,15 +75,11 @@ AmrLevelWave::initData ()
 	    // snew[bi](i,j,k,2*n) = 1+ampl[n]*std::exp(-width[n]*rr2);
 	    // snew[bi](i,j,k,2*n+1) = 0;
 	    
-	    // snew[bi](i,j,k,0) = 4*4*4*
-	    //   std::atan(mu_coeff*std::sin((1-mu*mu)*t0)/std::cosh(mu*(x-midpts[0])))*
-	    //   std::atan(mu_coeff*std::sin((1-mu*mu)*t0)/std::cosh(mu*(y-midpts[1])))*
-	    //   std::atan(mu_coeff*std::sin((1-mu*mu)*t0)/std::cosh(mu*(z-midpts[2])));
-	    // snew[bi](i,j,k,1) = 0;
-
+	    snew[bi](i,j,k,2*n) = SineGordon.breather_solution(x-midpts[0], 0);
+	    snew[bi](i,j,k,2*n+1) = SineGordon.breather_solution_deriv(x-midpts[0], 0); 
 	   
-	    snew[bi](i,j,k,2*n) = SineGordon.breather_solution(x-start_pos[0], y-start_pos[1], z-start_pos[2], start_times[0]) + SineGordon.breather_solution(x-start_pos[3], y-start_pos[4], z-start_pos[5], start_times[1]);
-	    snew[bi](i,j,k,2*n+1) = 0;
+	    //	    snew[bi](i,j,k,2*n) = SineGordon.breather_solution(x-start_pos[0], y-start_pos[1], z-start_pos[2], start_times[0]) + SineGordon.breather_solution(x-start_pos[3], y-start_pos[4], z-start_pos[5], start_times[1]);
+	    //	    snew[bi](i,j,k,2*n+1) = 0;
 
 
 	    

@@ -35,7 +35,7 @@ namespace {
                          const BCRec* /*bcr*/, const int /*bcomp*/,
                          const int /*orig_comp*/) const
         {
-	  //removed because periodic
+            //removed because periodic
 
             // In this test, we only need to fill the x-direction bounary,
             // because it's periodic in other directions.  We also could
@@ -112,7 +112,7 @@ AmrLevelWave::variableSetUp ()
 
     for (int n = 0; n < nfields; n++)
       {
-	char name[6];
+        char name[6];
 	sprintf(name, "phi%d", n);
 	param_names[2*n] = name;
 	sprintf(name, "dphi%d", n);
@@ -248,7 +248,7 @@ AmrLevelWave::post_timestep (int iteration)
 	//Original interpolation:	
 	FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
 	//Average between cell faces, also removes need for fill patch;
-	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
+	// average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
 
     }
 

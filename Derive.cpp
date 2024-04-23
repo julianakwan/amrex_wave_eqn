@@ -49,9 +49,9 @@ void derive_func_fab(const amrex::Box & bx, amrex::FArrayBox& derfab,int dcomp, 
 		       //		       amrex::Real rr2 = (x - midpts[0])*(x - midpts[0]) + (y - midpts[1])*(y - midpts[1]) + (z - midpts[2])*(z - midpts[2]);  // this is the radius 
 
 		       //		       amrex::Real exact_soln = std::cos(k_r*rr2-k_r*time);
-		       // amrex::Real exact_soln = SineGordon.breather_solution(x-midpts[0], time);
+		       amrex::Real exact_soln = SineGordon.breather_solution(x-midpts[0], time);
 
-		       s_out(i,j,k,dcomp) = s(i,j,k,0);//+s(i,j,k,2);
+		       s_out(i,j,k,dcomp) = exact_soln;
 		       // if (exact_soln==0)
 		       // 	 s_out(i,j,k,dcomp) = 0;
 		       // else
