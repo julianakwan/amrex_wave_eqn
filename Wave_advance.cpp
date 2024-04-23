@@ -22,16 +22,17 @@ AmrLevelWave::advance (Real time, Real dt, int iteration, int ncycle)
     return dt;
 }
 
-Real 
-AmrLevelWave::Potential(Real phi2)
-{
-  Real V = 0;
-  //  Real scalar_mass = 0;
+// Real 
+// AmrLevelWave::Potential(Real phi2)
+// {
+//   Real V = 0;
+//   //  Real scalar_mass = 0;
 
-  V = 0.5*scalar_mass*scalar_mass*phi2;
+//   V = 0.5*scalar_mass*scalar_mass*phi2;
+//   //  V = std::sin(phi2);
 
-  return V;
-}
+//   return V;
+// }
 
 
 void
@@ -43,6 +44,9 @@ AmrLevelWave::computeRHS (MultiFab& dSdt, MultiFab const& S)
                  Real dz2inv = dxinv[2]*dxinv[2]);
     auto const& sa = S.const_arrays();
     auto const& sdot = dSdt.arrays();
+
+    Potential my_potential(scalar_mass);
+	  
     amrex::ParallelFor(S,
     [=] AMREX_GPU_DEVICE (int bi, int i, int j, int k) noexcept
     {
@@ -52,15 +56,12 @@ AmrLevelWave::computeRHS (MultiFab& dSdt, MultiFab const& S)
 
 
       //      Real phi2 = std::pow(s(i,j,k,0),2)+std::pow(s(i,j,k,2),2);
-
-      Real phi2 = 0;
-
-      for (int n = 0; n < nfields; n++)
-	phi2 += std::pow(s(i,j,k,2*n),2);
+      amrex::Vector<amrex::Real> phi;
 
 
       for (int n = 0; n < nfields; n++)
 	{
+	  phi.push_back(s(i,j,k,2*n));
 
 	  f(i,j,k,2*n) = s(i,j,k,2*n+1);
 
@@ -73,7 +74,7 @@ AmrLevelWave::computeRHS (MultiFab& dSdt, MultiFab const& S)
 
 	  f(i,j,k,2*n+1) = AMREX_D_TERM(lapx, +lapy, +lapz);
 
-	  f(i,j,k,2*n+1) -= Potential(phi2);
+	  f(i,j,k,2*n+1) -= std::sin(s(i,j,k,2*n));
 
 	}
 

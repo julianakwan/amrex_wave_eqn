@@ -2,6 +2,7 @@
 #define AMRLEVEL_WAVE_H_
 
 #include <AMReX_AmrLevel.H>
+#include "Potential.H"
 
 enum StateType { State_Type = 0, NUM_STATE_TYPE };
 
@@ -85,7 +86,9 @@ public:
     // Need to be public for CUDA
     void computeRHS (amrex::MultiFab& dSdt, amrex::MultiFab const& S);
 
-    amrex::Real Potential (amrex::Real phi);
+  void Derive(const std::string &name, amrex::Real time, amrex:: MultiFab const &S, amrex::MultiFab &S_der);
+
+  //    amrex::Real Potential (amrex::Real phi);
 
 private:
 
@@ -100,13 +103,16 @@ private:
     static amrex::Vector<float> ampl;
     static amrex::Vector<float> width;
     static int nfields;
-    static double scalar_mass; 
-    static double tagging_criterion;
+    static amrex::Real tagging_criterion;
+    static amrex::Real scalar_mass; 
+    static amrex::Real k_r;
+    static amrex::Real alpha; 
 
     //! Function to read parameters from input file.
     static void read_params ();
 
     static int ncomp;
+    static amrex::Vector<std::string> diagnostics;//this is for error checking
   //  static constexpr int ncomp;//  = nfields*2; // Two variables: u & v  
 
     //! Get AmrLevelWave

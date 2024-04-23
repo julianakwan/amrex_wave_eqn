@@ -1,6 +1,7 @@
 #include "AmrLevelWave.H"
 #include <AMReX_ParmParse.H>
 #include <numeric>
+#include <Derive.H>
 
 using namespace amrex;
 
@@ -16,6 +17,16 @@ int AmrLevelWave::nfields = 1;
 Real AmrLevelWave::scalar_mass = 1.0;
 int AmrLevelWave::ncomp = nfields*2;
 Real AmrLevelWave::tagging_criterion = 1e3;
+Real AmrLevelWave::k_r = 1.0;
+Real AmrLevelWave::alpha = 1.0;
+Vector<std::string> AmrLevelWave::diagnostics;//this is for error checking
+
+
+static Box the_same_box(const Box& b)
+{
+  return b;
+}
+>>>>>>> test-interp
 
 namespace {
     struct WaveBCFill {
@@ -26,7 +37,7 @@ namespace {
                          const BCRec* /*bcr*/, const int /*bcomp*/,
                          const int /*orig_comp*/) const
         {
-	  //removed because periodic
+            //removed because periodic
 
             // In this test, we only need to fill the x-direction bounary,
             // because it's periodic in other directions.  We also could
@@ -77,6 +88,7 @@ AmrLevelWave::variableSetUp ()
                            StateDescriptor::Point, nghost, ncomp,
                            &cell_quartic_interp);
 
+
     // int lo_bc[BL_SPACEDIM] = {AMREX_D_DECL(BCType::ext_dir,    // external Dirichlet
     //                                        BCType::int_dir,    // periodic
     //                                        BCType::int_dir) }; // periodic
@@ -102,7 +114,11 @@ AmrLevelWave::variableSetUp ()
 
     for (int n = 0; n < nfields; n++)
       {
+<<<<<<< HEAD
 	char name[6];
+=======
+        char name[6];
+>>>>>>> test-interp
 	sprintf(name, "phi%d", n);
 	param_names[2*n] = name;
 	sprintf(name, "dphi%d", n);
@@ -115,12 +131,30 @@ AmrLevelWave::variableSetUp ()
 
 
     desc_lst.setComponent(State_Type, 0, param_names, bcs, bndryfunc); 
+
+
+    //New diagnostic variable for testing interpolation between levels (against analytic solution)
+
+    derive_lst.add(
+    		   "frac_error", amrex::IndexType::TheCellType(),
+       		   1, diagnostics,
+		   //		   amrex::DeriveFuncFab(),		   
+		   derive_func_fab,
+		   [=](const amrex::Box &box) { return amrex::grow(box, nghost);},
+    		   &amrex::cell_quartic_interp);
+
+    derive_lst.addComponent("frac_error", desc_lst, State_Type, 0, 1);
+
+
+
 }
+
 
 void
 AmrLevelWave::variableCleanUp ()
 {
     desc_lst.clear();
+    derive_lst.clear();
 }
 
 
@@ -218,12 +252,16 @@ AmrLevelWave::post_timestep (int iteration)
 
 	
 	//Original interpolation:	
-        FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
+	FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
 	//Average between cell faces, also removes need for fill patch;
-	//	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
+	// average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);	
+
     }
 
+
+
     AmrLevel::post_timestep(iteration);
+
 }
 
 void
@@ -247,6 +285,38 @@ AmrLevelWave::errorEst (TagBoxArray& tags, int /*clearval*/, int /*tagval*/,
 }
 
 void
+AmrLevelWave::Derive(const std::string &name, amrex::Real time, amrex::MultiFab const& S, amrex::MultiFab &S_new)
+{
+  constexpr Real k_r = 100;
+  constexpr Real omega = 100;
+
+  const auto problo = geom.ProbLoArray();
+  const auto dx = geom.CellSizeArray();
+
+  auto const& sa = S.const_arrays();
+
+  //  S_new = get_new_data(State_Type);
+  auto const& sa_out = S_new.arrays();
+
+  amrex::ParallelFor(S, 
+    [=] AMREX_GPU_DEVICE (int bi, int i, int j, int k) noexcept
+		     {
+		       auto const& s = sa[bi];
+		       //		       auto const& s_out = sa_out[bi];
+
+		       Real x = problo[0] + (i+0.5)*dx[0];
+		       Real y = problo[1] + (j+0.5)*dx[1]; 
+		       Real z = problo[2] + (k+0.5)*dx[2];
+					
+		       Real rr2 = (x - 0.5)*(x - 0.5) + (y - 0.5)*(y - 0.5) + (z - 0.5)*(z - 0.5);  // this is the radius 
+
+		       Real exact_soln = std::cos(k_r*rr2-omega*time);
+		       //		       sa_out[bi](i,j,k,0) = amrex::Math::abs(s(i,j,k,0)-exact_soln);
+
+		     });
+}
+
+void
 AmrLevelWave::read_params ()
 {
     ParmParse pp("wave");
@@ -257,7 +327,12 @@ AmrLevelWave::read_params ()
     pp.getarr("initial_amplitude", ampl,0,nfields); 
     pp.getarr("initial_width", width,0,nfields); 
     pp.query("scalar_mass", scalar_mass); 
+<<<<<<< HEAD
     pp.query("tagging_criterion", tagging_criterion);
+=======
+    pp.query("wave_vector", k_r);
+    pp.query("alpha", alpha);  
+>>>>>>> test-interp
 
     ncomp = 2*nfields;
 
