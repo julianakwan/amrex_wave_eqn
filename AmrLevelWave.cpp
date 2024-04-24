@@ -22,11 +22,6 @@ Real AmrLevelWave::alpha = 1.0;
 Vector<std::string> AmrLevelWave::diagnostics;//this is for error checking
 
 
-static Box the_same_box(const Box& b)
-{
-  return b;
-}
->>>>>>> test-interp
 
 namespace {
     struct WaveBCFill {
@@ -114,11 +109,7 @@ AmrLevelWave::variableSetUp ()
 
     for (int n = 0; n < nfields; n++)
       {
-<<<<<<< HEAD
-	char name[6];
-=======
         char name[6];
->>>>>>> test-interp
 	sprintf(name, "phi%d", n);
 	param_names[2*n] = name;
 	sprintf(name, "dphi%d", n);
@@ -327,12 +318,10 @@ AmrLevelWave::read_params ()
     pp.getarr("initial_amplitude", ampl,0,nfields); 
     pp.getarr("initial_width", width,0,nfields); 
     pp.query("scalar_mass", scalar_mass); 
-<<<<<<< HEAD
     pp.query("tagging_criterion", tagging_criterion);
-=======
     pp.query("wave_vector", k_r);
     pp.query("alpha", alpha);  
->>>>>>> test-interp
+
 
     ncomp = 2*nfields;
 
