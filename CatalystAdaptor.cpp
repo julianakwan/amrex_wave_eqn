@@ -451,7 +451,7 @@ void MultiLevelToParaviewConduitBlueprint(
       // make sure we are not asking for more components than exist.
       BL_ASSERT(varnames.size() <= fab.nComp());
 
-      //	    amrex::Print() << fab.box().numPts() << "\n";
+      // amrex::Print() << fab.box().numPts() << "\n";
 
       // add ghost indicator if the fab has ghost cells
       // if(ngrow > 0)

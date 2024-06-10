@@ -202,7 +202,7 @@ void AmrLevelWave::post_timestep(int iteration) {
     // Original interpolation:
     FourthOrderInterpFromFineToCoarse(S_crse, 0, 2, S_fine, ratio);
     // Average between cell faces, also removes need for fill patch;
-    //	average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);
+    // average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);
   }
 
   // Move this into the loop over levels?
