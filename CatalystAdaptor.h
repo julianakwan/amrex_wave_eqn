@@ -49,7 +49,6 @@ void Execute(int verbosity, int cycle, double time, int iteration,
              const amrex::Vector<amrex::IntVect> &ref_ratios,
              const amrex::Vector<const amrex::MultiFab *> &mfs);
 
-
 void MultiLevelToParaviewConduitBlueprint(
     int verbosity, int numLevels,
     const amrex::Vector<const amrex::MultiFab *> &mfs,
