@@ -3,6 +3,8 @@ from paraview.simple import *
 from paraview import catalyst
 import time
 
+#paraview.simple._DisableFirstRenderCameraReset()
+
 # registrationName must match the channel name used in the
 # 'CatalystAdaptor'.
 producer = PVTrivialProducer(registrationName="input")
@@ -15,24 +17,9 @@ producer = PVTrivialProducer(registrationName="input")
 # Create a new 'Render View'
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [800,800]
-renderView1.CameraPosition = [0.5, 0.5, 3.8460652149512318]
+renderView1.CameraPosition = [0.5, 0.5, 2.0]
 renderView1.CameraFocalPoint = [0.5, 0.5, 0.5]
 renderView1.CameraParallelScale = 0.8660254037844386
-
-
-# get color transfer function/color map for 'velocity'
-#velocityLUT = GetColorTransferFunction('velocity')
-#velocityLUT.RGBPoints = [0.0, 0.231373, 0.298039, 0.752941, 29.205000000000002, 0.865003, 0.865003, 0.865003, 58.410000000000004, 0.705882, 0.0156863, 0.14902]
-#velocityLUT.ScalarRangeInitialized = 1.0
-
-clip1 = Clip(registrationName="Clip1", Input=producer)
-clip1.ClipType='Plane'
-clip1.HyperTreeGridClipper='Plane'
-clip1.Scalars = ['CELLS', 'phi0']
-
-
-clip1.ClipType.Origin = [0.0,0.0,0.0]
-clip1.ClipType.Normal = [0.0,1.0,0.0]
 
 # create a new 'Slice'
 slice1 = Slice(registrationName='Slice1', Input=producer)
@@ -51,6 +38,7 @@ slice1.SliceType.Normal = [0.0, 0.0, -1.0]
 
 
 # show data from grid
+#gridDisplay = Show(slice1, renderView1, 'UniformGridRepresentation')
 gridDisplay = Show(slice1, renderView1, 'AMRRepresentation')
 
 # trace defaults for the display properties.
@@ -119,7 +107,7 @@ pNG1 = CreateExtractor('PNG', renderView1, registrationName='PNG1')
 pNG1.Trigger = 'TimeStep'
 
 # init the 'PNG' selected for 'Writer'
-pNG1.Writer.FileName = 'screenshot_{timestep:06d}.png'
+pNG1.Writer.FileName = 'screenshot_{timestep:06d}_test.png'
 pNG1.Writer.ImageResolution = [1600,800]
 pNG1.Writer.Format = 'PNG'
 
@@ -129,7 +117,7 @@ SetActiveSource(pNG1)
 # Catalyst options
 options = catalyst.Options()
 options.GlobalTrigger = 'TimeStep'
-options.ExtractsOutputDirectory = "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/insitu-viz/"
+options.ExtractsOutputDirectory = "/home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/insitu-viz/paraview_5p12"
 
 if "--enable-live" in catalyst.get_args():
   options.EnableCatalystLive = 1

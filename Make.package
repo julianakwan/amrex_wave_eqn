@@ -3,7 +3,6 @@ CEXE_headers += AmrWave.H AmrLevelWave.H
 
 #----Flags/variables etc required for Catalyst----# 
 ifeq ($(USE_CATALYST),TRUE)
-#    CATALYST_IMPLEMENTATION_PATHS = /rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst
     CEXE_sources += CatalystAdaptor.cpp
     CEXE_headers += CatalystAdaptor.h 	 
     DEFINES += -DUSE_CATALYST	
