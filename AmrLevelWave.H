@@ -1,8 +1,8 @@
 #ifndef AMRLEVEL_WAVE_H_
 #define AMRLEVEL_WAVE_H_
 
-#include <AMReX_AmrLevel.H>
 #include "Potential.H"
+#include <AMReX_AmrLevel.H>
 
 enum StateType { State_Type = 0, NUM_STATE_TYPE };
 
@@ -98,19 +98,17 @@ private:
   static amrex::Real k_r;
   static amrex::Real alpha;
 
-
   //! Function to read parameters from input file.
   static void read_params();
 
+  static int ncomp;
+  static amrex::Vector<std::string> diagnostics; // this is for error checking
+  //  static constexpr int ncomp;//  = nfields*2; // Two variables: u & v
 
-    static int ncomp;
-    static amrex::Vector<std::string> diagnostics;//this is for error checking
-  //  static constexpr int ncomp;//  = nfields*2; // Two variables: u & v  
-
-    //! Get AmrLevelWave
-    AmrLevelWave& getLevel (int lev) {
-        return static_cast<AmrLevelWave&>(parent->getLevel(lev));
-    }
+  //! Get AmrLevelWave
+  AmrLevelWave &getLevel(int lev) {
+    return static_cast<AmrLevelWave &>(parent->getLevel(lev));
+  }
 };
 
 #endif
