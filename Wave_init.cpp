@@ -32,18 +32,10 @@ void AmrLevelWave::initData() {
     Real y = problo[1] + (j + 0.5) * dx[1];
     Real z = problo[2] + (k + 0.5) * dx[2];
 
-    //	Real rr2 = (x-0.5)*(x-0.5)+(y-0.5)*(y-0.5)+(z-0.5)*(z-0.5);
 
-    //        constexpr Real Pi = 3.1415926535897932384626;
-    // constexpr Real mu = 0.7;
-    // constexpr Real mu_coeff = mu/(std::sqrt(1-mu*mu));
-    // constexpr Real t0 = 0;
-
-    // constexpr Real k_r = 1;
-    // constexpr Real omega = 1;
     for (int n = 0; n < nfields; n++) {
-      //	    snew[bi](i,j,k,2*n) = 0.0;
-      //	    snew[bi](i,j,k,2*n+1) = std::exp(-16.*rr2) *
+      // snew[bi](i,j,k,2*n) = 0.0;
+      // snew[bi](i,j,k,2*n+1) = std::exp(-16.*rr2) *
       //std::pow(std::cos(Pi*rr2),6);
 
       // snew[bi](i,j,k,2*n) = 1+ampl[n]*std::exp(-width[n]*rr2);
@@ -53,11 +45,12 @@ void AmrLevelWave::initData() {
       snew[bi](i, j, k, 2 * n + 1) =
           SineGordon.breather_solution_deriv(x - midpts[0], 0);
 
-      //	    snew[bi](i,j,k,2*n) =
+      //snew[bi](i,j,k,2*n) =
       //SineGordon.breather_solution(x-start_pos[0], y-start_pos[1],
       //z-start_pos[2], start_times[0]) +
       //SineGordon.breather_solution(x-start_pos[3], y-start_pos[4],
-      //z-start_pos[5], start_times[1]); 	    snew[bi](i,j,k,2*n+1) = 0;
+      //z-start_pos[5], start_times[1]);
+      //snew[bi](i,j,k,2*n+1) = 0;
     }
   });
 }

@@ -117,7 +117,6 @@ void AmrLevelWave::variableSetUp() {
 
   derive_lst.add(
       "frac_error", amrex::IndexType::TheCellType(), 1, diagnostics,
-      //		   amrex::DeriveFuncFab(),
       derive_func_fab,
       [=](const amrex::Box &box) { return amrex::grow(box, nghost); },
       &amrex::cell_quartic_interp);
