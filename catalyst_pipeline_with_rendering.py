@@ -17,9 +17,9 @@ producer = PVTrivialProducer(registrationName="input")
 # Create a new 'Render View'
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [800,800]
-renderView1.CameraPosition = [0.5, 0.5, 2.0]
-renderView1.CameraFocalPoint = [0.5, 0.5, 0.5]
-renderView1.CameraParallelScale = 0.8660254037844386
+renderView1.CameraPosition = [5., 5., 20.0]
+renderView1.CameraFocalPoint = [5.0, 5.0, 5.0]
+renderView1.CameraParallelScale = 8.660254037844386
 
 # create a new 'Slice'
 slice1 = Slice(registrationName='Slice1', Input=producer)
@@ -28,10 +28,10 @@ slice1.HyperTreeGridSlicer = 'Plane'
 slice1.SliceOffsetValues = [0.0]
 
 # init the 'Plane' selected for 'SliceType'
-slice1.SliceType.Origin = [0.5, 0.5, 0.5]
+slice1.SliceType.Origin = [5., 5., 5.]
 
 # init the 'Plane' selected for 'HyperTreeGridSlicer'
-slice1.HyperTreeGridSlicer.Origin = [0.5, 0.5, 0.5]
+slice1.HyperTreeGridSlicer.Origin = [5., 5., 5.]
 
 # Properties modified on slice1.SliceType
 slice1.SliceType.Normal = [0.0, 0.0, -1.0]
@@ -64,8 +64,8 @@ gridDisplay.ScalarOpacityUnitDistance = 0.0065053373254344085
 
 
 # get color transfer function/color map for 'phi0'
-phi0LUT = GetColorTransferFunction('phi0')
-gridDisplay.LookupTable = phi0LUT
+phi0_LUT = GetColorTransferFunction('phi0')
+gridDisplay.LookupTable = phi0_LUT
 
 
 # rescale color and/or opacity maps used to include current data range
@@ -83,7 +83,7 @@ phi0_TF2D = GetTransferFunction2D('phi0')
 
 
 # get color legend/bar for velocityLUT in view renderView1
-phi0_LUTColorBar = GetScalarBar(phi0LUT, renderView1)
+phi0_LUTColorBar = GetScalarBar(phi0_LUT, renderView1)
 phi0_LUTColorBar.Title = 'phi0'
 
 # set color bar visibility
@@ -92,7 +92,14 @@ phi0_LUTColorBar.Visibility = 1
 # set scalar coloring
 ColorBy(gridDisplay, ('CELLS', 'phi0'))
 
+# Rescale transfer function
+phi0_LUT.RescaleTransferFunction(-8.5, 8.5)
 
+# Rescale transfer function
+phi0_PWF.RescaleTransferFunction(-8.5, 8.5)
+
+# Rescale 2D transfer function
+phi0_TF2D.RescaleTransferFunction(-8.5, 8.5, 0.0, 1.0)
 # show color legend
 gridDisplay.SetScalarBarVisibility(renderView1, True)
 
@@ -107,7 +114,7 @@ pNG1 = CreateExtractor('PNG', renderView1, registrationName='PNG1')
 pNG1.Trigger = 'TimeStep'
 
 # init the 'PNG' selected for 'Writer'
-pNG1.Writer.FileName = 'screenshot_{timestep:06d}_test.png'
+pNG1.Writer.FileName = 'sine_gordon_3d_{timestep:06d}.png'
 pNG1.Writer.ImageResolution = [1600,800]
 pNG1.Writer.Format = 'PNG'
 

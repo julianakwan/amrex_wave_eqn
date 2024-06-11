@@ -1,5 +1,5 @@
-max_step = 5
-stop_time = 1
+max_step = 300
+stop_time = 100
 catalyst_input_script = /home/dc-kwan1/amrex/amrex-tutorials/amrex_wave_eqn/catalyst_pipeline_with_rendering.py
 paraview_directory=/rds/project/rds-YVo7YUJF2mk/dc-kwan1/paraview-superbuild/install/lib/catalyst
 # for paraview 5.11 use /rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst
@@ -9,7 +9,7 @@ paraview_directory=/rds/project/rds-YVo7YUJF2mk/dc-kwan1/paraview-superbuild/ins
 geometry.is_periodic =  1  1  1                    
 geometry.coord_sys   =  0       # 0 => cart
 geometry.prob_lo     =  0.0  0.0  0.0
-geometry.prob_hi     =  1.0  1.0  1.0         
+geometry.prob_hi     =  10.0  10.0  10.0         
 
 amr.n_cell           =  128 128 128
 

@@ -68,7 +68,7 @@ void AmrLevelWave::computeRHS(MultiFab &dSdt, MultiFab const &S) {
 
       f(i, j, k, 2 * n + 1) = AMREX_D_TERM(lapx, +lapy, +lapz);
 
-      f(i, j, k, 2 * n + 1) -= Potential(phi2);
+      f(i, j, k, 2 * n + 1) -= std::sin(s(i, j, k, 2 * n)); // Potential(phi2);
     }
   });
   Gpu::streamSynchronize();
