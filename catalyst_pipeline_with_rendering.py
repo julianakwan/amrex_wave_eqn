@@ -64,7 +64,7 @@ gridDisplay.ScalarOpacityUnitDistance = 0.0065053373254344085
 
 
 # get color transfer function/color map for 'phi0'
-phi0_LUT = GetColorTransferFunction('phi0')
+phi0_LUT = GetColorTransferFunction('dphi0')
 gridDisplay.LookupTable = phi0_LUT
 
 
@@ -114,7 +114,7 @@ pNG1 = CreateExtractor('PNG', renderView1, registrationName='PNG1')
 pNG1.Trigger = 'TimeStep'
 
 # init the 'PNG' selected for 'Writer'
-pNG1.Writer.FileName = 'main_test_{timestep:06d}.png'
+pNG1.Writer.FileName = 'test_{timestep:06d}.png'
 pNG1.Writer.ImageResolution = [1600,800]
 pNG1.Writer.Format = 'PNG'
 
@@ -139,15 +139,13 @@ def catalyst_execute(info):
     global producer, grid
     producer.UpdatePipeline()
     print(producer.GetDataInformation().GetDataAssembly())
-#    gridInfo = producer.GetSubsetDataInformation(0, "//grid", "Hierarchy");
+
 
     print("-----------------------------------")
     print("executing (cycle={}, time={})".format(info.cycle, info.time))
-#    print("bounds:", gridInfo.GetBounds())
 
     SaveExtractsUsingCatalystOptions(options)
-#    print("phi0-range:", producer.PointData["phi0"].GetRange(-1))
-#    print("fractional error-range:", producer.CellData["phi0"].GetRange(-1))
+
     # In a real simulation sleep is not needed. We use it here to slow down the
     # "simulation" and make sure ParaView client can catch up with the produced
     # results instead of having all of them flashing at once.

@@ -7,6 +7,7 @@
 #include <AMReX_Conduit_Blueprint.H>
 #include <AMReX_Geometry.H>
 #include <AMReX_MultiFab.H>
+#include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
 
 #include "conduit_cpp_to_c.hpp"
@@ -27,48 +28,44 @@ using namespace amrex;
 
 namespace CatalystAdaptor {
 
-/**
- * In this example, we show how we can use Catalysts's C++
- * wrapper around conduit's C API to create Conduit nodes.
- * This is not required. A C++ adaptor can just as
- * conveniently use the Conduit C API to setup the
- * `conduit_node`. However, this example shows that one can
- * indeed use Catalyst's C++ API, if the developer so chooses.
- */
-void Initialize(std::string filename, std::string catalyst_options,
+  void Initialize(std::string filename, std::vector<std::string> catalyst_options,
                 std::string paraview_impl_dir) {
   // Populate the catalyst_initialize argument based on the "initialize"
-  // protocol [1]. [1]
+  // protocol
   // https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-initialize
   conduit_cpp::Node node;
 
-  // Using the arguments given to the driver set the filename for the catalyst
-  // script and pass the rest of the arguments as arguments of the script
-  // itself. To retrieve these  arguments from the script  use the `get_args()`
-  // method of the paraview catalyst module [2]
-  // [2]
-  // https://kitware.github.io/paraview-docs/latest/python/paraview.catalyst.html
-  //  node["catalyst/scripts/script/filename"].set_string(argv[1]);
-
+  // This is the Python script that controls ParaView
   node["catalyst/scripts/script/filename"] = filename;
 
-  // TODO: this will fail for more than one option!
-  conduit_cpp::Node list_entry = node["catalyst/scripts/script/args"].append();
-  list_entry.set(catalyst_options);
+  // Pass in any arguments to ParaView
+  // Each entry must be of type list and passed as a separate node
+  //  std::istringstream iss(catalyst_options);
+  //  std::string option;
+  // while (std::getline(iss, option, ' ')) {
+  //   conduit_cpp::Node list_entry =
+  //       node["catalyst/scripts/script/args"].append();
+  //   list_entry.set(option);
+  // }
 
-  // For this example we hardcode the implementation name to "paraview" and
-  // define the "PARAVIEW_IMPL_DIR" during compilation time (see the
-  // accompanying CMakeLists.txt). We could however defined them via
-  // environmental variables  see [1].
+  for (auto const &i : catalyst_options) {
+    conduit_cpp::Node list_entry =
+        node["catalyst/scripts/script/args"].append();
+    list_entry.set(i);
+  }
   node["catalyst_load/implementation"] = "paraview";
+
+  // This is the directory to the catalyst library
   node["catalyst_load/search_paths/paraview"] = paraview_impl_dir;
 
   catalyst_status err = catalyst_initialize(conduit_cpp::c_node(&node));
   if (err != catalyst_status_ok) {
-    amrex::Print() << "Failed to initialize Catalyst: " << err << "\n";
+    amrex::Print() << "Failed to initialize Catalyst: " << err << std::endl;
   } else {
-    amrex::Print() << "Initialized Catalyst: " << err << "with options"
-                   << catalyst_options << "\n";
+    amrex::Print() << "Initialized Catalyst: " << err << " with options: " << std::endl;
+    for (auto const &i : catalyst_options){
+      amrex::Print() << i << std::endl;
+    }
   }
 }
 
@@ -76,8 +73,7 @@ void Execute(int verbosity, int cycle, double time, int iteration,
              int output_levs, const amrex::Vector<amrex::Geometry> &geoms,
              const amrex::Vector<amrex::IntVect> &ref_ratios,
              const amrex::Vector<const amrex::MultiFab *> &mfs) {
-  // Populate the catalyst_execute argument based on the "execute" protocol [3].
-  // [3]
+  // Populate the catalyst_execute argument based on the "execute" protocol
   // https://docs.paraview.org/en/latest/Catalyst/blueprints.html#protocol-execute
 
   // Note that this is conduit not conduit_cpp for compatibility with AMReX's
@@ -98,8 +94,7 @@ void Execute(int verbosity, int cycle, double time, int iteration,
   // the ones expected by ParaView.  In this example we use the Mesh Blueprint
   // to describe data see also bellow.
 
-  /*   // Add channels. */
-  /*   // We only have 1 channel here. Let's name it 'input'. */
+  // The name of the channel must match the
   auto &channel = exec_params["catalyst/channels/input"];
 
   /*   // Since this example is using Conduit Mesh Blueprint to define the mesh,
@@ -120,37 +115,30 @@ void Execute(int verbosity, int cycle, double time, int iteration,
   for (int i = 0; i < output_levs; i++)
     level_steps.push_back(iteration);
 
-  // TODD: this should be passed in with AMReX's desc list of variables
+
+  amrex::ParmParse pp("paraview");
+
+  std::string nm;
   amrex::Vector<std::string> varnames;
-  varnames.push_back("phi0");
+  int nPltVars = pp.countval("plot_vars");
+
+  for (int i = 0; i < nPltVars; i++) {
+    pp.get("plot_vars", nm, i);
+
+    varnames.push_back(nm);
+
+    // if (nm == "ALL") {
+    //   amrex::Amr::fillStatePlotVarList();
+    // } else if (nm == "NONE") {
+    //   amrex::Amr::clearStatePlotVarList();
+    // } else {
+    //   amrex::Amr::addStatePlotVar(nm);
+    // }
+  }
+
 
   amrex::MultiLevelToBlueprint(output_levs, mfs, varnames, geoms, time,
                                level_steps, ref_ratios, mesh);
-
-  // only single level works at the moment
-
-  // if (output_levs == 1)
-  //   TestMultiLevelToParaviewConduitBlueprint(
-  //       verbosity,   // if > 1 then print grid info
-  //       output_levs, // how many levels?
-  //       mfs,         // MultiFab object
-  //       varnames,    // name of fields passed to conduit
-  //       geoms,       // Simulation geometry
-  //       time,        //
-  //       level_steps, // these are the iterations
-  //       ref_ratios,  // ref ratio
-  //       mesh);       // conduit node object
-  // else
-  //   MultiLevelToParaviewConduitBlueprint(
-  //       verbosity,   // if > 1 then print grid info
-  //       output_levs, // how many levels?
-  //       mfs,         // MultiFab object
-  //       varnames,    // name of fields passed to conduit
-  //       geoms,       // Simulation geometry
-  //       time,        //
-  //       level_steps, // these are the iterations
-  //       ref_ratios,  // ref ratio
-  //       mesh);       // conduit node object
 
   if (verbosity > 0) {
     exec_params.print();

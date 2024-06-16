@@ -1,9 +1,10 @@
-max_step = 100
-stop_time = 10
-catalyst_input_script = /home/dc-kwan1/amrex/amrex-tutorials/amrex_wave_eqn/catalyst_pipeline_with_rendering.py
-paraview_directory=/rds/project/rds-YVo7YUJF2mk/dc-kwan1/paraview-superbuild/install/lib/catalyst
+max_step = 3
+stop_time = 1
+paraview.input_script = /home/dc-kwan1/amrex/amrex-tutorials/amrex_wave_eqn/catalyst_pipeline_with_rendering.py
+paraview.path_to_catalyst_lib=/rds/project/rds-YVo7YUJF2mk/dc-kwan1/paraview-superbuild/install/lib/catalyst
 # for paraview 5.11 use /rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst
-#catalyst_options = --enable-live
+#paraview.options = --enable-live
+paraview.plot_vars = phi0
 
 
 geometry.is_periodic =  1  1  1                    
@@ -28,6 +29,7 @@ amr.check_int = 100
 amr.plot_files_output = 0  # write plot files or not
 amr.plot_int = 0         # write plotfile every ? steps
 amr.plot_vars = ALL
+amr.derive_plot_vars = ALL
 amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/insitu-viz/paraview_5p12/plt_
 
 

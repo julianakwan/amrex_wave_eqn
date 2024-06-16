@@ -243,9 +243,31 @@ void AmrLevelWave::post_timestep(int iteration) {
 
   Real time = get_state_data(State_Type).curTime();
   amrex::Print() << "Number of levels: " << output_levs << "\n";
+
+  // names of variables we want to plot
+  std::vector<std::string> catalyst_names;
+  const std::list<DeriveRec> &dlist = derive_lst.dlist();
+  for (auto const &d : dlist) {
+    if (amrex::Amr::isDerivePlotVar(d.name())) {
+      catalyst_names.push_back(d.name());
+    }
+  }
+
+  for (int typ = 0; typ < desc_lst.size(); typ++) {
+    for (int comp = 0; comp < desc_lst[typ].nComp(); comp++) {
+      if (amrex::Amr::isStatePlotVar(desc_lst[typ].name(comp)) &&
+          desc_lst[typ].getType() == IndexType::TheCellType()) {
+        catalyst_names.push_back(desc_lst[typ].name(comp));
+      }
+    }
+  }
+
+  for (int i = 0; i < catalyst_names.size(); i++)
+    amrex::Print() << "Plot vars = " << catalyst_names[i] << std::endl;
+
   CatalystAdaptor::Execute(verbose, nStep(), time, iteration, output_levs,
                            geoms, ref_ratios, mfs);
-  //    amrex::Print() << "Current iteration = " << nStep() << "\n";
+
 #endif
 
   AmrLevel::post_timestep(iteration);

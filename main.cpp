@@ -24,15 +24,22 @@ int main(int argc, char *argv[]) {
   }
 
 #ifdef USE_CATALYST
-  ParmParse pp;
+  ParmParse pp("paraview");
   std::string catalyst_filename;
-  std::string catalyst_options;
   std::string paraview_impl_dir;
+  std::vector<std::string> catalyst_options;
 
-  pp.query("catalyst_input_script", catalyst_filename);
-  pp.query("catalyst_options", catalyst_options);
-  pp.query("paraview_directory", paraview_impl_dir);
+  pp.query("input_script", catalyst_filename);
+  pp.query("path_to_catalyst_lib", paraview_impl_dir);
 
+  std::string nm;
+  int n_opts = pp.countval("options");
+  for (int i = 0; i < n_opts; i++) {
+    pp.get("options", nm, i);
+    catalyst_options.push_back(nm);
+  }
+  
+  //  pp.query("options", catalyst_options);
   CatalystAdaptor::Initialize(catalyst_filename, catalyst_options,
                               paraview_impl_dir);
 #endif

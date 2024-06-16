@@ -57,7 +57,7 @@ amrex::Real InitialConditions::travelling_wave(const amrex::Real x,
   // (y-y_midpt) and (z-z_midpt)
   amrex::Real rr2 = x * x + y * y + z * z; // this is the radius
 
-  return std::cos(m_k_r * rr2 - m_omega * t);
+  return std::cos(m_alpha * rr2 - m_alpha * t);
 }
 
 amrex::Real InitialConditions::travelling_wave_deriv(
@@ -65,7 +65,8 @@ amrex::Real InitialConditions::travelling_wave_deriv(
     const amrex::Real t) const {
   // for the wave to be at the center of the grid, need to pass in (x-x_midpt),
   // (y-y_midpt) and (z-z_midpt)
+  // alpha is the wavenumber
   amrex::Real rr2 = x * x + y * y + z * z; // this is the radius
 
-  return m_omega * std::sin(m_k_r * rr2 - m_omega * t);
+  return m_alpha * std::sin(m_alpha * rr2 - m_alpha * t);
 }
