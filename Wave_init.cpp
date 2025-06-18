@@ -1,5 +1,7 @@
 #include "AmrLevelWave.H"
 #include "InitialConditions.H"
+
+#include <AMReX_ParmParse.H>
 #include <cmath>
 
 using namespace amrex;
@@ -17,12 +19,9 @@ void AmrLevelWave::initData() {
   MultiFab &S_new = get_new_data(State_Type);
   auto const &snew = S_new.arrays();
 
-  constexpr Real t0 = -5.4;
-
-  amrex::Vector<amrex::Real> start_times{-5.4, 5.4};
-  amrex::Vector<amrex::Real> start_pos{
-      midpts[0], midpts[1], midpts[2] + 0.5 * midpts[2],
-      midpts[0], midpts[1], midpts[2] - 0.5 * midpts[2]};
+  amrex::Real t0 = -5.4;
+  amrex::ParmParse pp("wave");
+  pp.query("initial_time", t0);
 
   InitialConditions SineGordon(alpha, k_r);
 
@@ -33,7 +32,7 @@ void AmrLevelWave::initData() {
     Real z = problo[2] + (k + 0.5) * dx[2];
 
 
-    for (int n = 0; n < nfields; n++) {
+    for (int n = 0; n < NFIELDS; n++) {
       // snew[bi](i,j,k,2*n) = 0.0;
       // snew[bi](i,j,k,2*n+1) = std::exp(-16.*rr2) *
       //std::pow(std::cos(Pi*rr2),6);
@@ -41,16 +40,14 @@ void AmrLevelWave::initData() {
       // snew[bi](i,j,k,2*n) = 1+ampl[n]*std::exp(-width[n]*rr2);
       // snew[bi](i,j,k,2*n+1) = 0;
 
-      snew[bi](i, j, k, 2 * n) = SineGordon.breather_solution(x - midpts[0], 0);
-      snew[bi](i, j, k, 2 * n + 1) =
-          SineGordon.breather_solution_deriv(x - midpts[0], 0);
+      // snew[bi](i, j, k, 2 * n) = SineGordon.breather_solution(x - midpts[0], 0);
+      // snew[bi](i, j, k, 2 * n + 1) =
+      //     SineGordon.breather_solution_deriv(x - midpts[0], 0);
 
-      //snew[bi](i,j,k,2*n) =
-      //SineGordon.breather_solution(x-start_pos[0], y-start_pos[1],
-      //z-start_pos[2], start_times[0]) +
-      //SineGordon.breather_solution(x-start_pos[3], y-start_pos[4],
-      //z-start_pos[5], start_times[1]);
-      //snew[bi](i,j,k,2*n+1) = 0;
+      snew[bi](i,j,k,2*n) =
+      SineGordon.breather_solution(x-midpts[0], y-midpts[1],
+				   z-midpts[2], t0);
+      snew[bi](i,j,k,2*n+1) = 0;
     }
   });
 }

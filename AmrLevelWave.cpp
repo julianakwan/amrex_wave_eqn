@@ -3,7 +3,9 @@
 #include <Derive.H>
 #include <numeric>
 
-#ifdef USE_CATALYST
+#define USE_CATALYST 0
+
+#if USE_CATALYST
 #include "CatalystAdaptor.h"
 #endif
 
@@ -17,9 +19,8 @@ int AmrLevelWave::rk_order = 4;
 Real AmrLevelWave::cfl = 0.2;
 Vector<float> AmrLevelWave::ampl;
 Vector<float> AmrLevelWave::width;
-int AmrLevelWave::nfields = 1;
 Real AmrLevelWave::scalar_mass = 1.0;
-int AmrLevelWave::ncomp = nfields * 2;
+int AmrLevelWave::ncomp = NFIELDS * 2;
 Real AmrLevelWave::tagging_criterion = 1e3;
 Real AmrLevelWave::k_r = 1.0;
 Real AmrLevelWave::alpha = 1.0;
@@ -99,7 +100,7 @@ void AmrLevelWave::variableSetUp() {
   // amrex::Print() << ncomp <<  "\n";
   // amrex::Print() << nfields <<  "\n";
 
-  for (int n = 0; n < nfields; n++) {
+  for (int n = 0; n < NFIELDS; n++) {
     char name[6];
     sprintf(name, "phi%d", n);
     param_names[2 * n] = name;
@@ -221,7 +222,7 @@ void AmrLevelWave::post_timestep(int iteration) {
     //  average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);
   }
 
-#ifdef USE_CATALYST
+#if USE_CATALYST
 
   // If using insitu, then save the grid geometry, field data and refinement
   // ratios as containers to pass into Catalyst
@@ -280,11 +281,12 @@ void AmrLevelWave::errorEst(TagBoxArray &tags, int /*clearval*/, int /*tagval*/,
   const char tagval = TagBox::SET;
   auto const &a = tags.arrays();
   auto const &s = S_new.const_arrays();
+  auto local_tagging_criterion = tagging_criterion;
   amrex::ParallelFor(tags, [=] AMREX_GPU_DEVICE(int bi, int i, int j, int k) {
     // Just an example, not necessarily good choice.
     // TODO: this is only in the first scalar field, have to check for the other
     // fields also
-    if (amrex::Math::abs(s[bi](i, j, k, 1)) > tagging_criterion) {
+    if (amrex::Math::abs(s[bi](i, j, k, 1)) > local_tagging_criterion) {
       a[bi](i, j, k) = tagval;
     }
   });
@@ -295,15 +297,14 @@ void AmrLevelWave::read_params() {
   pp.query("v", verbose); // Could use this to control verbosity during the run
   pp.query("rk_order", rk_order);
   pp.query("cfl", cfl);
-  pp.query("nfields", nfields);
-  pp.getarr("initial_amplitude", ampl, 0, nfields);
-  pp.getarr("initial_width", width, 0, nfields);
+  pp.getarr("initial_amplitude", ampl, 0, NFIELDS);
+  pp.getarr("initial_width", width, 0, NFIELDS);
   pp.query("scalar_mass", scalar_mass);
   pp.query("tagging_criterion", tagging_criterion);
   pp.query("wave_vector", k_r);
   pp.query("alpha", alpha);
 
-  ncomp = 2 * nfields;
+  ncomp = 2 * NFIELDS;
 
   // // read array of initial amplitudes
   // Vector<float> ampl;

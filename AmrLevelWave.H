@@ -4,6 +4,8 @@
 #include "Potential.H"
 #include <AMReX_AmrLevel.H>
 
+#define NFIELDS 1 
+
 enum StateType { State_Type = 0, NUM_STATE_TYPE };
 
 class AmrLevelWave : public amrex::AmrLevel {
@@ -92,7 +94,6 @@ private:
   static amrex::Real cfl;
   static amrex::Vector<float> ampl;
   static amrex::Vector<float> width;
-  static int nfields;
   static amrex::Real scalar_mass;
   static amrex::Real tagging_criterion;
   static amrex::Real k_r;

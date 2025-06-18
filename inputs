@@ -1,8 +1,9 @@
 max_step = 3
 stop_time = 1
-paraview.input_script = /home/dc-kwan1/amrex/amrex-tutorials/amrex_wave_eqn/catalyst_pipeline_with_rendering.py
-paraview.path_to_catalyst_lib=/rds/project/rds-YVo7YUJF2mk/dc-kwan1/paraview-superbuild/install/lib/catalyst
+paraview.input_script = catalyst_pipeline_with_rendering.py
+paraview.path_to_catalyst_lib= <add your path here> 
 # for paraview 5.11 use /rds/project/rds-YVo7YUJF2mk/shared/paraview/build-v5.11.0/install/lib/catalyst
+# for paraview 5.12 use /rds/project/rds-YVo7YUJF2mk/dc-kwan1/paraview-superbuild/install/lib/catalyst
 #paraview.options = --enable-live
 paraview.plot_vars = phi0
 
@@ -30,7 +31,7 @@ amr.plot_files_output = 0  # write plot files or not
 amr.plot_int = 0         # write plotfile every ? steps
 amr.plot_vars = ALL
 amr.derive_plot_vars = ALL
-amr.plot_file = /home/dc-kwan1/rds/rds-dirac-dp002/dc-kwan1/AMReX/wave/insitu-viz/paraview_5p12/plt_
+amr.plot_file = plt_
 
 
 wave.v = 1                      # prints extra outputs incl. Conduit Blueprint files
@@ -42,5 +43,5 @@ wave.initial_width = 0.001
 wave.scalar_mass = 10.0
 wave.tagging_criterion = 10  #tag cells for refinement when the derivative in phi reaches this value
 wave.alpha = 0.7
-
+wave.initial_time = -5.4
 

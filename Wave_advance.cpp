@@ -32,17 +32,7 @@ void AmrLevelWave::computeRHS(MultiFab &dSdt, MultiFab const &S) {
     auto const &s = sa[bi];
     auto const &f = sdot[bi];
 
-    Real phi2 = 0;
-
-    for (int n = 0; n < nfields; n++)
-      phi2 += std::pow(s(i, j, k, 2 * n), 2);
-
-    //      Real phi2 = std::pow(s(i,j,k,0),2)+std::pow(s(i,j,k,2),2);
-    amrex::Vector<amrex::Real> phi;
-
-    for (int n = 0; n < nfields; n++) {
-      phi.push_back(s(i, j, k, 2 * n));
-
+    for (int n = 0; n < NFIELDS; n++) {
       f(i, j, k, 2 * n) = s(i, j, k, 2 * n + 1);
 
       AMREX_D_TERM(
@@ -64,7 +54,7 @@ void AmrLevelWave::computeRHS(MultiFab &dSdt, MultiFab const &S) {
 
       f(i, j, k, 2 * n + 1) = AMREX_D_TERM(lapx, +lapy, +lapz);
 
-      f(i, j, k, 2 * n + 1) -= std::sin(s(i, j, k, 2 * n));
+      f(i, j, k, 2 * n + 1) -= std::cos(s(i, j, k, 2 * n));
     }
   });
   Gpu::streamSynchronize();
