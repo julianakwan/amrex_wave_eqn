@@ -7,7 +7,7 @@ jobs:
   # Build all tutorials
   build_wave_eqn:
     name: GNU@7.5 C++14 [tutorials]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
 #      {CXXFLAGS: "-Werror -Wshadow -Woverloaded-virtual -Wunreachable-code -fno-operator-names"}
       AMREX_HOME: ${{ github.workspace }}/amrex
@@ -30,11 +30,3 @@ jobs:
       run: |
           cd ${{ github.workspace }}/amrex_wave_eqn
           make -j 4 USE_CATALYST=FALSE USE_CONDUIT=FALSE
-#    - name: Run Python
-#      run: |
-#        cd GuidedTutorials/MultiFab/
-#        python main.py
-#        cd ../HeatEquation/Source/
-#        python main.py
-
-
