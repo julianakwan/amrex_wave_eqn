@@ -11,6 +11,7 @@ jobs:
     env:
       CXXFLAGS: "-Werror -Wshadow -Woverloaded-virtual -Wunreachable-code -fno-operator-names"
       AMREX_HOME: ${{ github.workspace }}/amrex
+      COMP: gnu
     steps:
     - name: Checkout AMReX
       uses: actions/checkout@v4
@@ -29,12 +30,12 @@ jobs:
     - name: Build test case
       run: |
           cd ${{ github.workspace }}/amrex_wave_eqn
-          make -j 4 USE_CATALYST=FALSE USE_CONDUIT=FALSE
+          make -j 4 USE_CATALYST=FALSE USE_CONDUIT=FALSE COMP=${{ env.COMP }}
 
     - name: Run test case
-      run: mpiexec -np 2 ./main3d.intel-llvm.MPI.ex ./inputs
+      run: mpiexec -np 2 ./main3d.$${{ env.COMP }}.MPI.ex ./inputs
       working-directory: ${{ github.workspace }}/amrex_wave_eqn
 
     - name: Build fcompare tool
-      run: make -j 4 ${{ env.BUILD_ARGS }}
+      run: make -j 4 COMP=${{ env.COMP }}
       working-directory: ${{ env.AMREX_HOME }}/Tools/Plotfile
