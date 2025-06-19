@@ -3,9 +3,8 @@
 #include <Derive.H>
 #include <numeric>
 
-#define USE_CATALYST 0
 
-#if USE_CATALYST
+#ifdef USE_CATALYST
 #include "CatalystAdaptor.h"
 #endif
 
@@ -222,7 +221,7 @@ void AmrLevelWave::post_timestep(int iteration) {
     //  average_down(S_fine, S_crse, 0, S_crse.nComp(), ratio);
   }
 
-#if USE_CATALYST
+#ifdef USE_CATALYST
 
   // If using insitu, then save the grid geometry, field data and refinement
   // ratios as containers to pass into Catalyst

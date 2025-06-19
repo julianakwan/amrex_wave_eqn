@@ -25,29 +25,27 @@ void AmrLevelWave::initData() {
 
   InitialConditions SineGordon(alpha, k_r);
 
-  amrex::ParallelFor(S_new, [=] AMREX_GPU_DEVICE(int bi, int i, int j,
-                                                 int k) noexcept {
-    Real x = problo[0] + (i + 0.5) * dx[0];
-    Real y = problo[1] + (j + 0.5) * dx[1];
-    Real z = problo[2] + (k + 0.5) * dx[2];
+  amrex::ParallelFor(
+      S_new, [=] AMREX_GPU_DEVICE(int bi, int i, int j, int k) noexcept {
+        Real x = problo[0] + (i + 0.5) * dx[0];
+        Real y = problo[1] + (j + 0.5) * dx[1];
+        Real z = problo[2] + (k + 0.5) * dx[2];
 
+        for (int n = 0; n < NFIELDS; n++) {
+          // snew[bi](i,j,k,2*n) = 0.0;
+          // snew[bi](i,j,k,2*n+1) = std::exp(-16.*rr2) *
+          // std::pow(std::cos(Pi*rr2),6);
 
-    for (int n = 0; n < NFIELDS; n++) {
-      // snew[bi](i,j,k,2*n) = 0.0;
-      // snew[bi](i,j,k,2*n+1) = std::exp(-16.*rr2) *
-      //std::pow(std::cos(Pi*rr2),6);
+          // snew[bi](i,j,k,2*n) = 1+ampl[n]*std::exp(-width[n]*rr2);
+          // snew[bi](i,j,k,2*n+1) = 0;
 
-      // snew[bi](i,j,k,2*n) = 1+ampl[n]*std::exp(-width[n]*rr2);
-      // snew[bi](i,j,k,2*n+1) = 0;
+          // snew[bi](i, j, k, 2 * n) = SineGordon.breather_solution(x -
+          // midpts[0], 0); snew[bi](i, j, k, 2 * n + 1) =
+          //     SineGordon.breather_solution_deriv(x - midpts[0], 0);
 
-      // snew[bi](i, j, k, 2 * n) = SineGordon.breather_solution(x - midpts[0], 0);
-      // snew[bi](i, j, k, 2 * n + 1) =
-      //     SineGordon.breather_solution_deriv(x - midpts[0], 0);
-
-      snew[bi](i,j,k,2*n) =
-      SineGordon.breather_solution(x-midpts[0], y-midpts[1],
-				   z-midpts[2], t0);
-      snew[bi](i,j,k,2*n+1) = 0;
-    }
-  });
+          snew[bi](i, j, k, 2 * n) = SineGordon.breather_solution(
+              x - midpts[0], y - midpts[1], z - midpts[2], t0);
+          snew[bi](i, j, k, 2 * n + 1) = 0;
+        }
+      });
 }

@@ -2,9 +2,9 @@
 #include <AMReX.H>
 #include <AMReX_ParmParse.H>
 
-#define USE_CATALYST 0
+// #define USE_CATALYST 0
 
-#if USE_CATALYST
+#ifdef USE_CATALYST
 #include "CatalystAdaptor.h"
 #endif
 
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     pp.query("stop_time", stop_time);
   }
 
-#if USE_CATALYST
+#ifdef USE_CATALYST
   ParmParse pp("paraview");
   std::string catalyst_filename;
   std::string paraview_impl_dir;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-#if USE_CATALYST
+#ifdef USE_CATALYST
   CatalystAdaptor::Finalize();
 #endif
 
