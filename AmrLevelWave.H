@@ -4,7 +4,7 @@
 #include "Potential.H"
 #include <AMReX_AmrLevel.H>
 
-#define NFIELDS 1 
+#define NFIELDS 1
 
 enum StateType { State_Type = 0, NUM_STATE_TYPE };
 

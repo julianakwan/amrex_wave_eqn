@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-latest
     env:
       AMREX_HOME: ${{ github.workspace }}/amrex
-      
+
     steps:
     - name: Checkout AMReX
       uses: actions/checkout@v4
@@ -26,11 +26,9 @@ jobs:
 
     - name: Dependencies
       run: ${{ github.workspace }}/amrex_wave_eqn/.github/workflows/dependencies/dependencies_mac.sh
-      
+
     - name: Build & Install
       run: |
        export LIBRARY_PATH=/usr/local/opt/gcc/lib/gcc/current
        cd ${{ github.workspace }}/amrex_wave_eqn
        make -j 4 USE_CONDUIT=FALSE USE_CATALYST=FALSE
-
-

@@ -3,7 +3,6 @@
 #include <Derive.H>
 #include <numeric>
 
-
 #ifdef USE_CATALYST
 #include "CatalystAdaptor.h"
 #endif

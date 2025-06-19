@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v4
       with:
        path: ${{ github.workspace }}/amrex_wave_eqn
-       
+
     - name: Dependencies
       run: ${{ github.workspace }}/amrex_wave_eqn/.github/workflows/dependencies/dependencies.sh
 
