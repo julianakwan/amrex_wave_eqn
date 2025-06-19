@@ -32,3 +32,8 @@ jobs:
        export LIBRARY_PATH=/usr/local/opt/gcc/lib/gcc/current
        cd ${{ github.workspace }}/amrex_wave_eqn
        make -j 4 USE_CONDUIT=FALSE USE_CATALYST=FALSE
+
+    - name: Run test case
+      run: mpiexec -np 2 ./main3d.intel-llvm.MPI.ex ./inputs
+      with:
+       path: ${{ github.workspace }}/amrex_wave_eqn       
