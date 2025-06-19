@@ -6,7 +6,6 @@ The initial condition is a Gaussian pulse: $1.0 + A * exp(-r^2/\sigma)$
 
 
 There are several properties of the scalar fields that are set in the input parameter file:
-* wave.nfields - the number of scalar fields
 * wave.initial_amplitude - the initial amplitude of the Gaussian pulse, there should nfield integers here, separated by a space
 * wave.initial_width - intial width of Gaussian pulse, again one value per scalar field
 * wave.scalar_mass - scalar field mass, one per scalar field
@@ -17,14 +16,15 @@ For in-situ visualizations, you will also need to set:
 * catalyst_input_script - path to the Python script with ParaView commands
 * catalyst_options (optional) - pass optional flags to ParaView e.g. --enable-live for ParaView Live
 
-
+The number of fields simulated is set in a macro NFIELDS defined in AmrLevelWave.H
 
 Build Instructions: 
 * Clone the AMReX repository [here](https://github.com/AMReX-Codes/amrex). AMReX has the following requirements: GNU make >=3.81, Python >=2.7, C++ compiler with C++17 support, Fortran compiler with Fortran 2003 standard support
-* Clone this repository. For the in-situ component, you will also need ParaView >= 5.9, Conduit, Catalyst 2.0 and make sure that PARAVIEW_DIR and CONDUIT_DIR are set to their install directories. 
-* In the directory for this repo, edit the GNUmakefile for your system - here you can choose your compiler by changing the COMP variable (either gnu, intel or intel-llvm). Be sure to also set the location to AMReX in AMREX_HOME. You can also also change USE_CATALYST to TRUE for in-situ visualizations. If you want to debug by outputting Conduit Blueprint files you will also need to set USE_CONDUIT to TRUE. (Also set the verbosity level.)
-* If USE_CATALYST is set to TRUE, you will need to define $PARAVIEW_DIR such athat it points to the directory where ParaView and Catalyst are installed, i.e. $PARAVIEW_DIR/include/Catalyst-2.0 should contain the Catalyst2 header files. 
-* Then run make 
+* Set `AMREX_HOME` to the location of the AMReX directory
+* Clone this repository. For the in-situ component, you will also need ParaView >= 5.9, Conduit, Catalyst 2.0 and make sure that `PARAVIEW_DIR` and `CONDUIT_DIR` are set to their install directories. 
+* In the directory for this repo, edit the GNUmakefile for your system - here you can choose your compiler by changing the COMP variable (either gnu, intel or intel-llvm). You can also also change `USE_CATALYST=TRUE` for in-situ visualizations. If you want to debug by outputting Conduit Blueprint files you will also need to set `USE_CONDUIT= TRUE`. (Also set the verbosity level.)
+* If `USE_CATALYST=TRUE`, you will need to define `$PARAVIEW_DIR` such athat it points to the directory where ParaView and Catalyst are installed, i.e. `$PARAVIEW_DIR/include/Catalyst-2.0` should contain the Catalyst2 header files. 
+* Then run `make` 
 
 
 From the original README: 
