@@ -27,7 +27,7 @@ jobs:
     - name: Dependencies
       run: ${{ github.workspace }}/amrex_wave_eqn/.github/workflows/dependencies/dependencies_mac.sh
 
-    - name: Build & Install
+    - name: Build & install test case
       run: |
        export LIBRARY_PATH=/usr/local/opt/gcc/lib/gcc/current
        cd ${{ github.workspace }}/amrex_wave_eqn
@@ -36,3 +36,7 @@ jobs:
     - name: Run test case
       run: mpiexec -np 2 ./main3d.intel-llvm.MPI.ex ./inputs
       working-directory: ${{ github.workspace }}/amrex_wave_eqn
+
+    - name: Build fcompare tool
+      run: make -j 4 ${{ env.BUILD_ARGS }}
+      working-directory: ${{ env.AMREX_HOME }}/Tools/Plotfile

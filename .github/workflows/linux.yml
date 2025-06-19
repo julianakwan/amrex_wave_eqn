@@ -9,7 +9,7 @@ jobs:
     name: GNU@7.5 C++14 [tutorials]
     runs-on: ubuntu-22.04
     env:
-#      {CXXFLAGS: "-Werror -Wshadow -Woverloaded-virtual -Wunreachable-code -fno-operator-names"}
+      CXXFLAGS: "-Werror -Wshadow -Woverloaded-virtual -Wunreachable-code -fno-operator-names"
       AMREX_HOME: ${{ github.workspace }}/amrex
     steps:
     - name: Checkout AMReX
@@ -26,11 +26,18 @@ jobs:
     - name: Dependencies
       run: ${{ github.workspace }}/amrex_wave_eqn/.github/workflows/dependencies/dependencies.sh
 
-    - name: Build & Install
+    - name: Check environment variables
+      run: env
+
+    - name: Build test case
       run: |
           cd ${{ github.workspace }}/amrex_wave_eqn
           make -j 4 USE_CATALYST=FALSE USE_CONDUIT=FALSE
 
     - name: Run test case
-      run: mpiexec -np 2 ./main3d.intel-llvm.MPI.ex ./inputs
+      run: mpiexec -np 2 ./main3d.${{ env.COMP }}.MPI.ex ./inputs
       working-directory: ${{ github.workspace }}/amrex_wave_eqn
+
+    - name: Build fcompare tool
+      run: make -j 4 ${{ env.BUILD_ARGS }}
+      working-directory: ${{ env.AMREX_HOME }}/Tools/Plotfile
