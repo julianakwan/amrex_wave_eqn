@@ -30,3 +30,7 @@ jobs:
       run: |
           cd ${{ github.workspace }}/amrex_wave_eqn
           make -j 4 USE_CATALYST=FALSE USE_CONDUIT=FALSE
+
+    - name: Run test case
+      run: mpiexec -np 2 ./main3d.intel-llvm.MPI.ex ./inputs
+      working-directory: ${{ github.workspace }}/amrex_wave_eqn
